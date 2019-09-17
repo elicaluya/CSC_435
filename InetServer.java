@@ -41,18 +41,26 @@ class Worker extends Thread
 	}
 
 
+	// Method for looking up address from client and sending back info to client
 	static void printRemoteAddress (String name, PrintStream out)
 	{
 		try {
+			// Send back to client message that server is looking up hostname
 			out.println("Looking up " + name + "...");
+			//  get the info from the hostname/address given by client
 			InetAddress machine = InetAddress.getByName(name);
+			// Send back to client the hostname that the machine variable got
 			out.println("Host name : " + machine.getHostName());
+			// Send back to client the IP address from the machine variable got
 			out.println("Host IP : " + toText(machine.getAddress()));
+		// If unable to get the info from the hostname/address, send back to client failed message
 		} catch (UnknownHostException ex) {
 			out.println("Failed in attempt to look up " + name);
 		}
 	}
 
+
+	// Method for converting byte IP address to string 
 	static String toText(byte ip[])
 	{
 		StringBuffer result = new StringBuffer();
@@ -65,21 +73,24 @@ class Worker extends Thread
 	}
 }
 
+
+// Class for server
 public class InetServer 
 {
 	public static void main(String args[]) throws IOException 
 	{
-		int q_len = 6;
-		int port = 1565;
-		Socket sock;
+		int q_len = 6;			// Number of requests for OpSys to queue
+		int port = 1565;		// Port number we will use
+		Socket sock;			// SOcket variable to connect with client
 
+		// Construct server socket on set port and with number of queue requests
 		ServerSocket servsock = new ServerSocket(port, q_len);
 
 		System.out.println("Clark Elliott's Inet server 1.8 starting up, listening at port 1565.\n");
 
 		while (true) {
-			sock = servsock.accept();
-			new Worker(sock).start();
+			sock = servsock.accept();		// Wait for client connection
+			new Worker(sock).start();		// Create new Worker thread for the client
 		}
 	}
 }
