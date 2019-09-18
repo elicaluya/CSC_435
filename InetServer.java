@@ -90,7 +90,7 @@ public class InetServer
 
 		while (true) {
 			sock = servsock.accept();		// Wait for client connection
-			new Worker(sock).start();		// Create new Worker thread for the client
+			new Worker(sock).start();		// Create new Worker thread once client connection is accepted
 		}
 	}
 }
