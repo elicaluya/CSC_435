@@ -7,57 +7,24 @@ class Worker extends Thread
 {
 
 	Socket sock;		// Create local variable for socket object
-	Boolean isJoke = true;
-	Worker (Socket s) {sock = s;}		// Worker class constructor makes the local variable sock to Socket argument given
+	String message;
+	Worker (Socket s, String m) {sock = s; message = m;}		// Worker class constructor makes the local variable sock to Socket argument given
 
 	// Override Thread.run() method for our own implementation 
 	public void run()
 	{
 		PrintStream out = null;		// PrintStream variable so we can write data to Output Stream back to the client
-		BufferedReader in = null;	// Create a buffer to read text from character-input stream from the client
 
 		try {
-			// Initialize buffer variable to read the input stream from the client connection
-			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			// Initialize our PrintStream variable to write to the OutputStream of the socket (back to the client)
 			out = new PrintStream(sock.getOutputStream());
-
-			try {
-				String name;
-				// readLine method converts input from buffer into String and we set that to the variable "name"
-				name = in.readLine();
-				System.out.println("Got from client: " + name);	
-				
-				sendMessage(out,this.isJoke);
-			} catch (IOException x) {
-				// Throw error if there is a problem reading from the buffer from the socket
-				System.out.println("Server read error");
-				x.printStackTrace();		// Print out IOException data to console log
-			}
+			
+			out.println(message);
 
 			// Close the connection with the socket
 			sock.close();
 		// Print error if there is problem initializing variables for our input and output streams
 		} catch (IOException ioe) {System.out.println(ioe);}
-	}
-
-	public void sendMessage(PrintStream out, Boolean joke){
-		String[] joke_array = new String[]{"JA","JB","JC","JD"};
-		String[] proverb_array = new String[]{"PA","PB","PC","PD"};
-		int i = 0;
-
-		while (joke){
-			out.println(joke_array[i]);
-			i++;
-			if (i == joke_array.length)
-				i = 0;
-		}
-		while (!joke) {
-			out.println(proverb_array[i]);
-			i++;
-			if (i == joke_array.length)
-				i = 0;
-		}
 	}
 
 }
@@ -66,20 +33,65 @@ class Worker extends Thread
 // Class for server
 public class JokeServer 
 {
+
+	public static int getJokeProverbIndex(int index)
+	{
+		index++;
+		if (index == 4)
+			index = 0;
+		return index;
+	}
+
+
+	public static String getInfo(Socket sock){
+		BufferedReader inClient = null;	// Create a buffer to read text from character-input stream from the client
+		DataInputStream inAdmin = null;
+		String input = "";
+		int fromAdmin = 0;
+
+		try {
+			inClient = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			System.out.println("Got connection from client");
+			input = inClient.readLine();
+
+		} catch (IOException i){
+			System.out.println(i);
+		}
+		return input;
+	}
+
+
 	public static void main(String args[]) throws IOException 
 	{
 		int q_len = 6;			// Number of requests for OpSys to queue
 		int port = 4545;		// Port number we will use
 		Socket sock;			// Socket variable to connect with client
+		Boolean isJoke = true;
+		int jokeIndex = -1, proverbIndex = -1;
+		String infoFromClient;
+
+		String[] joke_array = new String[]{"JA","JB","JC","JD"};
+		String[] proverb_array = new String[]{"PA","PB","PC","PD"};
 
 		// Construct server socket on set port and with max queue length for incoming connection requests
 		ServerSocket servsock = new ServerSocket(port, q_len);
 		System.out.println("Server is running...");
 
+
+
 		while (true) {						// Infinite loop:
 			sock = servsock.accept();		// Wait for client connection
-			// Create new Worker thread once client connection is accepted and do code in run() method with start() call
-			new Worker(sock).start();		
+			infoFromClient = getInfo(sock);
+
+
+			if (isJoke){
+				jokeIndex = getJokeProverbIndex(jokeIndex);
+				new Worker(sock,joke_array[jokeIndex]).start();
+			}
+			else {
+				proverbIndex = getJokeProverbIndex(proverbIndex);
+				new Worker(sock,proverb_array[proverbIndex]).start();
+			}
 		}
 	}
 }

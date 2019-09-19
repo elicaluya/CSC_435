@@ -3,7 +3,7 @@ import java.net.*;	// For Java networking libraries
 
 
 // Class for client to connect to server
-public class JokeClient 
+public class JokeClientAdmin 
 {
 
 	public static void main (String args[])
@@ -47,10 +47,11 @@ public class JokeClient
 			toServer.flush();
 
 
-			
-			textFromServer = fromServer.readLine();		// Read in one line from the output from server
-			// If the output from server is not null, print the output on a new line.
-			System.out.println(textFromServer);
+			do {
+				textFromServer = fromServer.readLine();		// Read in one line from the output from server
+				// If the output from server is not null, print the output on a new line.
+				System.out.println(textFromServer);
+			} while (textFromServer != null);
 			
 			
 			// Close connection with server
