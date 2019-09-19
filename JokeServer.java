@@ -42,10 +42,22 @@ class Worker extends Thread
 	}
 
 	public void sendMessage(PrintStream out, Boolean joke){
-		if (joke)
-			out.println("Why did the chicken cross the road?");
-		else
-			out.println("One who sits on toilet, gets high on pot");
+		String[] joke_array = new String[]{"JA","JB","JC","JD"};
+		String[] proverb_array = new String[]{"PA","PB","PC","PD"};
+		int i = 0;
+
+		while (joke){
+			out.println(joke_array[i]);
+			i++;
+			if (i == joke_array.length)
+				i = 0;
+		}
+		while (!joke) {
+			out.println(proverb_array[i]);
+			i++;
+			if (i == joke_array.length)
+				i = 0;
+		}
 	}
 
 }
@@ -57,7 +69,7 @@ public class JokeServer
 	public static void main(String args[]) throws IOException 
 	{
 		int q_len = 6;			// Number of requests for OpSys to queue
-		int port = 1565;		// Port number we will use
+		int port = 4545;		// Port number we will use
 		Socket sock;			// Socket variable to connect with client
 
 		// Construct server socket on set port and with max queue length for incoming connection requests
