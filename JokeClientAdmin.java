@@ -1,5 +1,6 @@
 import java.io.*; 	// For Input and Ouput
 import java.net.*;	// For Java networking libraries
+import java.util.*;
 
 
 // Class for client to connect to server
@@ -8,25 +9,38 @@ public class JokeClientAdmin
 
 	public static void main (String args[])
 	{
-		String name;
-
-		// Initialize the buffer to read in user input
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		Scanner scanner = new Scanner(System.in);
+		String input;
+		String message;
+		
 	
-		System.out.print("Enter name: ");
+		System.out.print("Hello Admin, enter 'j' for joke mode or 'p' for proverb mode: ");
 		System.out.flush();				// Make sure everything written to Standard out is sent
+			
+		input = scanner.nextLine();
+
+		if (input.equals("j")){
+			message = "ADMIN: joke";
+			setMode(message, "localhost");
+		}
+		else if (input.equals("p")){
+			message = "ADMIN: proverb";
+			setMode(message, "localhost");
+		}
+		else {
+			System.out.println("Invalid entry");
+			return;
+		}
+		
 
 		
-		try {
-			name = in.readLine();
-			getMessage(name, "localhost");
-		} catch (IOException x) {x.printStackTrace();}		// Print data in output console
+		
 	}
 
 
 
 	// Method for sending and receiving data to server from client
-	static void getMessage(String name, String serverName)
+	static void setMode(String message, String serverName)
 	{
 		Socket sock;					// Socket variable for connection to server
 		BufferedReader fromServer;		// Buffer variable to store output from server
@@ -41,17 +55,18 @@ public class JokeClientAdmin
 			// Set up output stream to go to the server from the socket
 			toServer = new PrintStream(sock.getOutputStream());
 
+			
+
 			// Send name to Server where the server will read in the line
-			toServer.println(name);
+			toServer.println(message);
 			// Make sure that everything sent over to server is sent out
 			toServer.flush();
 
 
-			do {
-				textFromServer = fromServer.readLine();		// Read in one line from the output from server
-				// If the output from server is not null, print the output on a new line.
-				System.out.println(textFromServer);
-			} while (textFromServer != null);
+			
+			textFromServer = fromServer.readLine();		// Read in one line from the output from server
+			// If the output from server is not null, print the output on a new line.
+			System.out.println(textFromServer);
 			
 			
 			// Close connection with server
