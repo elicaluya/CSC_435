@@ -9,51 +9,48 @@ public class JokeClientAdmin
 
 	public static void main (String args[])
 	{
-		Scanner scanner = new Scanner(System.in);
+		
 		String input;
 		String message;
 		
 	
-		System.out.print("Hello Admin, enter 'j' for joke mode or 'p' for proverb mode: ");
+		System.out.println("Hello Admin, enter 'joke' for joke mode or 'proverb' for proverb mode: ");
 		System.out.flush();				// Make sure everything written to Standard out is sent
 			
-		input = scanner.nextLine();
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		if (input.equals("j")){
-			message = "ADMIN: joke";
-			setMode(message, "localhost");
+		try {
+			input = in.readLine();
+			setMode(input);
+		} catch (IOException i) {
+			System.out.println(i);
 		}
-		else if (input.equals("p")){
-			message = "ADMIN: proverb";
-			setMode(message, "localhost");
-		}
-		else {
-			System.out.println("Invalid entry");
-			return;
-		}
-		
-
-		
 		
 	}
 
 
 
 	// Method for sending and receiving data to server from client
-	static void setMode(String message, String serverName)
+	static void setMode(String message)
 	{
 		Socket sock;					// Socket variable for connection to server
 		BufferedReader fromServer;		// Buffer variable to store output from server
 		PrintStream toServer;			// PrintStrem variable to store output to the server
+		DataOutputStream intToServer;
 		String textFromServer;			// String variable to store output from server after converted to String
 
 		try {
-			sock = new Socket(serverName, 4545);	// Connect to client at given server name and port
+			sock = new Socket("localhost", 4545);	// Connect to client at given server name and port
 
 			// Read the output from the server through the socket and store the data into the buffer
 			fromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			// Set up output stream to go to the server from the socket
 			toServer = new PrintStream(sock.getOutputStream());
+
+			intToServer = new DataOutputStream(sock.getOutputStream());
+
+			intToServer.writeInt(1);
+
 
 			
 
@@ -62,6 +59,8 @@ public class JokeClientAdmin
 			// Make sure that everything sent over to server is sent out
 			toServer.flush();
 
+
+			intToServer.flush();
 
 			
 			textFromServer = fromServer.readLine();		// Read in one line from the output from server
