@@ -24,11 +24,15 @@ public class JokeClientAdmin
 		try {
 			String input;
 			do {
-				if (jokeMode)
-					System.out.println("Current Mode is Joke Mode");
-				else
-					System.out.println("Current Mode is Proverb Mode");
-				System.out.println("Press Enter to change mode or 'quit' to stop admin client");
+				if (jokeMode){
+					System.out.println("Current Mode is JOKE MODE");
+					System.out.println("Press Enter to change to PROVERB mode or 'quit' to stop admin client");
+				}
+				else{
+					System.out.println("Current Mode is PROVERB MODE");
+					System.out.println("Press Enter to change to JOKE mode or 'quit' to stop admin client");
+				}
+				
 				input = in.readLine();
 				if (input.indexOf("quit") < 0)	// Check if string entered is not "quit"
 					jokeMode = changeMode(serverName,jokeMode);	// If not quit, call changeMode() method to read output from server
@@ -81,6 +85,7 @@ public class JokeClientAdmin
 			textFromServer = fromServer.readLine();		// Read in one line from the output from server
 			// If the output from server is not null, print the output on a new line.
 			if (textFromServer != null) System.out.println(textFromServer);
+			System.out.println();
 			
 			// Close connection with server
 			sock.close();

@@ -54,18 +54,55 @@ class Worker extends Thread
 	}
 
 
-	// Get joke according to state of client
-	static String getJoke(String set, int size, String name)
+	static int randomJokeIndex(String state)
 	{
-		String[] jokes = {"JA","JB","JC","JD"};
-		return jokes[size/2] + " " + name + ":";
+		String[] jokeIDs = {"JA","JB","JC","JD"};
+	
+		Random random = new Random();
+		int randIndex = random.nextInt(4);
+
+		while (state.contains(jokeIDs[randIndex])){
+			randIndex = random.nextInt(4);
+		}
+
+		return randIndex;
+	}
+
+	static int randomProverbIndex(String state)
+	{
+		String[] proverbIDs = {"PA","PB","PC","PD"};
+
+		Random random = new Random();
+		int randIndex = random.nextInt(4);
+
+		while (state.contains(proverbIDs[randIndex])){
+			randIndex = random.nextInt(4);
+		}
+		
+		return randIndex;
+	}
+
+
+	// Get joke according to state of client
+	static String getJoke(String state, String name)
+	{
+		String[] jokes = {	"JA : What's brown and sticky? A stick",
+							"JB : A blind person was eating seafood. It didn't help",
+							"JC : I invented a new word! Plagiarism!",
+							"JD : Why do we tell actors to 'break a leg'? Because every play has a cast"};
+		int index = randomJokeIndex(state);
+		return jokes[index].substring(0,2) + " " + name + jokes[index].substring(2,jokes[index].length());
 	}
 
 	// Get proverb according to state of client
-	static String getProverb(String set, int size, String name)
+	static String getProverb(String state, String name)
 	{
-		String[] proverbs = {"PA","PB","PC","PD"};
-		return proverbs[size/2] + " " + name + ":";
+		String[] proverbs = {	"PA : Every now and then a blind pig snorts up a truffle",
+								"PB : A bad workman always blames his tools",
+								"PC : An idle brain is the devil's workshop",
+								"PD : Don't bite the hand that feeds you"};
+		int index = randomProverbIndex(state);
+		return proverbs[index].substring(0,2) + " " + name + proverbs[index].substring(2,proverbs[index].length());
 	}	
 
 	// Method for looking up address from client and sending back info back to client
@@ -77,19 +114,19 @@ class Worker extends Thread
 		if (isJoke){
 			if (jState.length() == 8){
 				jState = "";
-				System.out.println("Joke Cycle completed! Resetting jokes for " + name);
+				System.out.println("JOKE CYCLE COMPLETED! Resetting jokes for " + name);
 			}
 			
-			message = getJoke(jState, jState.length(),name);
+			message = getJoke(jState,name);
 			jState = jState + message.substring(0,2);
 		}
 		else{
 			if (pState.length() == 8){
 				pState = "";
-				System.out.println("Proverb Cycle completed! Resetting proverbs for " + name);
+				System.out.println("PROVERB CYCLE COMPLETED! Resetting proverbs for " + name);
 			}
 
-			message = getProverb(pState, pState.length(),name);
+			message = getProverb(pState, name);
 			pState = pState + message.substring(0,2);
 		}
 

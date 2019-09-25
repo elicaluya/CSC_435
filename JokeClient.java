@@ -66,7 +66,6 @@ public class JokeClient
 
 		try {
 			sock = new Socket(serverName, 1565);	// Connect to client at given server name and port
-			System.out.println("Connected to server");
 
 			// Set up output stream to go to the server from the socket
 			toServer = new PrintStream(sock.getOutputStream());
@@ -102,8 +101,15 @@ public class JokeClient
 			textmessageFromServer = messageFromServer.readLine();		// Read in one line from the output from server
 			jokeState = messageFromServer.readLine();
 			proverbState = messageFromServer.readLine();
+			
+
 			// If the output from server is not null, print the output on a new line.
 			if (textmessageFromServer != null) System.out.println(textmessageFromServer);
+			if (jokeState.length() == 8)
+				System.out.println("JOKE CYCLE COMPLETED! Will get new joke cycle on next request");
+			if (proverbState.length() == 8)
+				System.out.println("PROVERB CYCLE COMPLETED! Will get new proverb cycle on next request");
+			System.out.println();
 
 	
 			// Close connection with server
