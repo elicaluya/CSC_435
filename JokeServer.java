@@ -243,18 +243,9 @@ public class JokeServer
 		int q_len = 6;				// Number of requests for OpSys to queue
 		int primaryPort = 4545;		// Primary port number to connect to client
 		Socket sock;				// Socket variable to connect with client
-
-		Boolean secondaryEnabled = false;
 		
 
-
-		if (args.length == 1){
-			secondaryEnabled = true;
-			JokeServerSecondary secondServer = new JokeServerSecondary(args[0]);
-			Thread secondServerThread = new Thread(secondServer);
-			secondServerThread.start();
-
-		} else if (args.length > 2){
+		if (args.length > 2){
 			System.out.println("Too many arguments");
 			System.exit(0);
 		}
@@ -270,6 +261,11 @@ public class JokeServer
 		System.out.println("Elijah Caluya's Primary Joke server 1.8 starting up on localhost, listening at port " 
 							+ Integer.toString(primaryPort) + "\n");
 
+		if (args.length == 1){
+			JokeServerSecondary secondServer = new JokeServerSecondary(args[0]);
+			Thread secondServerThread = new Thread(secondServer);
+			secondServerThread.start();
+		}
 		
 
 		while (true) {						// Infinite loop:
