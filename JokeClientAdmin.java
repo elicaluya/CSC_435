@@ -64,81 +64,153 @@ import java.net.*;	// For Java networking libraries
 public class JokeClientAdmin 
 {
 
-	static Boolean isJoke = true;
+	
 	static int primaryPort = 5050;			// Primary server port to connect to server
 	static int secondaryPort = 5051;		// Secondary server port to connect to server
+	static int currentPort = primaryPort;
+
+	static String primaryServer = "";				// String to hold primary server for client admin
+	static String secondaryServer = "";				// String to hold secondary server for client admin
+	static String currentServer = primaryServer;	// By default set current server to primary server
+
+	static Boolean primaryJokeMode = true;			// By default, primary server starts out in Joke Mode
+	static Boolean secondaryJokeMode = true;		// By default, secondary server starts out in Proverb mode
+	static Boolean currentJokeMode = primaryJokeMode;
+
+	static Boolean isSecondaryEnabled = false;		// Secondary server access is not enabled at default
+	static Boolean s2Mode = false;					// Value to determine if sending info to secondary or primary server
 
 	public static void main (String args[])
 	{
-		String serverName;
 		// If User doesn't provide a server name in arguments, then set servername to localhost
-		if (args.length < 1) serverName = "localhost";
-		else serverName = args[0];
+		if (args.length < 1) primaryServer = "localhost";
+		else if (args.length == 1) primaryServer = args[0];
+		else if (args.length == 2) {
+			primaryServer = args[0];
+			secondaryServer = args[1];
+			isSecondaryEnabled = true;
+		} else {
+			System.out.println("Too many Arguments! JokeClientAdmin takes 1, 2, or no arguments.");
+			System.exit(0);
+		}
 
-		System.out.println("Elijah Caluya's Joke Client Admin, 1.8.\n");
-		System.out.println("using server: " + serverName + ", Port: " + Integer.toString(primaryPort));
+		System.out.println("Server one: " + primaryServer + ", port: " + Integer.toString(primaryPort));
+		if (isSecondaryEnabled)
+			System.out.println("Server one: " + secondaryServer + ", port: " + Integer.toString(secondaryPort));
+
 		
 		// Set up input stream to read user input
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		// Set default mode to joke mode
-		Boolean jokeMode = true;
+
 	
 		try {
 			String input;
 			do {
-				if (jokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
-					System.out.println("Current Mode is JOKE MODE");
-					System.out.println("Press Enter to change to PROVERB mode or 'quit' to stop admin client");
-				}	
-				else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
-					System.out.println("Current Mode is PROVERB MODE");
-					System.out.println("Press Enter to change to JOKE mode or 'quit' to stop admin client");
+				if (!s2Mode){
+					if (primaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
+						System.out.println("Current Mode is JOKE MODE");
+						System.out.println("Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
+					}	
+					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
+						System.out.println("Current Mode is PROVERB MODE");
+						System.out.println("Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
+					}
+				} else {
+					if (secondaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
+						System.out.println("<S2> Current Mode is JOKE MODE");
+						System.out.println("<S2> Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
+					}	
+					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
+						System.out.println("<S2> Current Mode is PROVERB MODE");
+						System.out.println("<S2> Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
+					}
 				}
+				
 
 				// Every time the user presses enter, the mode is changed on the server
 				input = in.readLine();	// Get input from user
-				if (input.indexOf("quit") < 0)	// Check if string entered is not "quit"
-					jokeMode = changeMode(serverName,jokeMode);	// If not quit, call changeMode() method to change mode of server
+				if (input.equals("s"))
+					switchSecondary();
+				else if (input.indexOf("quit") < 0)	// Check if string entered is not "quit"
+					changeMode(s2Mode);	// If not quit, call changeMode() method to change mode of server
 			// While the input is not quit, keep reading in line and sending info to server
 			} while (input.indexOf("quit") < 0);			// Else, print out message and then end program.
 				System.out.println("Cancelled by user request.");
 		} catch (IOException x) {x.printStackTrace();}		// Print data in output console
 	}
 
+	static void switchSecondary()
+	{
+		if (isSecondaryEnabled){
+			if (currentServer.equals(primaryServer))
+				currentServer = primaryServer;
+			else
+				currentServer = secondaryServer;
+
+			if (currentPort == primaryPort)
+				currentPort = secondaryPort;
+			else
+				currentPort = primaryPort;
+			System.out.println("Now communicating with " + currentServer 
+								+ " port " + Integer.toString(currentPort)+ "\n");
+			if (s2Mode)
+				s2Mode = false;
+			else
+				s2Mode = true;
+		} else 
+			System.out.println("No secondary server being used\n");
+	}
+
 
 	/*******************************************************************************************************************/
 	// 		Main method used to change the server mode and receive update from server
 	/*******************************************************************************************************************/
-	static Boolean changeMode(String serverName, Boolean isJoke)
+	static void changeMode(Boolean isS2)
 	{
 		Socket sock;					// Socket variable for connection to server
 		BufferedReader fromServer;		// Buffer variable to store output from server
 		DataOutputStream toServer;		// PrintStrem variable to store output to the server
-		String textFromServer;			// String variable to store output from server after converted to String
 		
 
 		try {
-			sock = new Socket(serverName, primaryPort);	// Connect to client at given server name and port
+			sock = new Socket(currentServer, currentPort);	// Connect to client at given server name and port
 
 			// Set the input stream to read in from the socket
 			fromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			// Set up output stream to send boolean value to server
 			toServer = new DataOutputStream(sock.getOutputStream());
 
-			// Send boolean value to server of the mode we want to change the server to
-			toServer.writeBoolean(!isJoke);
-			toServer.flush();	// Flush output stream
 
-			// Update the saved mode on the client admin
-			if (isJoke)
-				isJoke = false;
-			else
-				isJoke = true;
+			if (!isS2){
+				toServer.writeBoolean(isS2);
+				toServer.writeBoolean(!primaryJokeMode);	// Send boolean value to server of the mode we want to change the server to
+				toServer.flush();	// Flush output stream
+				// Update the saved mode on the client admin
+				if (primaryJokeMode)
+					primaryJokeMode = false;
+				else
+					primaryJokeMode = true;
 
+				String textFromPrimaryServer = fromServer.readLine();		// Read in update from server that server mode has changed
+				// If the output from server is not null, print the output on a new line.
+				if (textFromPrimaryServer != null) System.out.println(textFromPrimaryServer);
+			}
+			else{
+				toServer.writeBoolean(isS2);
+				toServer.writeBoolean(!secondaryJokeMode);	// Send boolean value to server of the mode we want to change the server to
+				toServer.flush();	// Flush output stream
+				// Update the saved mode on the client admin
+				if (secondaryJokeMode)
+					secondaryJokeMode = false;
+				else
+					secondaryJokeMode = true;
+
+				String textFromSecondaryServer = fromServer.readLine();		// Read in update from server that server mode has changed
+				// If the output from server is not null, print the output on a new line.
+				if (textFromSecondaryServer != null) System.out.println("<S2> " + textFromSecondaryServer);
+			}
 			
-			textFromServer = fromServer.readLine();		// Read in update from server that server mode has changed
-			// If the output from server is not null, print the output on a new line.
-			if (textFromServer != null) System.out.println(textFromServer);
+			
 			System.out.println();
 			
 			// Close connection with server
@@ -148,7 +220,5 @@ public class JokeClientAdmin
 			System.out.println("Socket error.");
 			x.printStackTrace();		// Print out IOException data to console log
 		}
-
-		return isJoke;
 	}
 }
