@@ -67,14 +67,14 @@ class Worker extends Thread
 
 	Socket sock;		// Create local variable for socket object
 	static Boolean isJoke;
-	Worker (Socket s, Boolean j) {sock = s; isJoke = j;}		// Worker class constructor makes the local variable sock to Socket argument given
+	static Boolean s2Mode;
+	Worker (Socket s, Boolean j, Boolean s2) {sock = s; isJoke = j; s2Mode = s2;}		// Worker class constructor makes the local variable sock to Socket argument given
 
 	// Override Thread.run() method for our own implementation 
 	public void run()
 	{
 		PrintStream out = null;		// PrintStream variable so we can write data to Output Stream back to the client
 		BufferedReader in = null;	// Create a buffer to read text from character-input stream from the client
-		DataInputStream s2in = null;
 
 		String jokeState = "";		// Variable to store joke state from the client
 		String proverbState = "";	// Variable to store proverb state from the client
@@ -83,14 +83,11 @@ class Worker extends Thread
 			// Initialize buffer variable to read the input stream from the client connection
 			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-			s2in = new DataInputStream(sock.getInputStream());
-
 			// Initialize our PrintStream variable to write to the OutputStream of the socket (back to the client)
 			out = new PrintStream(sock.getOutputStream());
 			
 
 			try {
-				Boolean s2Mode = s2in.readBoolean();
 
 				String name;	// The name we get in from the client
 				// Read in the name sent in from the client and store it
@@ -138,15 +135,11 @@ class Worker extends Thread
 			}
 			
 			// Set the message back to the client to the joke given the current joke state of the client
-			message = getJoke(jState,name, isS2);
-			if (!isS2){
-				// Update the joke state for the client
-				jState = jState + message.substring(0,2);
-			}
-			else {
-				// Update the joke state for the client
-				jState = jState + message.substring(5,7);
-			}
+			message = getJoke(jState,name);
+			
+			// Update the joke state for the client
+			jState = jState + message.substring(0,2);
+			
 			
 		}
 		else{			// If the server is set to proverb mode
@@ -163,15 +156,10 @@ class Worker extends Thread
 			}
 
 			// Set the message back to the client to the proverb given the current proverb state of the client
-			message = getProverb(pState, name, isS2);
-			if (!isS2){
-				// Update the proverb state for the client
-				pState = pState + message.substring(0,2);
-			}
-			else {
-				// Update the proverb state for the client
-				pState = pState + message.substring(5,7);
-			}
+			message = getProverb(pState, name);
+			
+			// Update the proverb state for the client
+			pState = pState + message.substring(0,2);
 			
 		}
 		
@@ -185,16 +173,8 @@ class Worker extends Thread
 			// If on Primary Server print out standard message
 			System.out.println("Sent " + message.substring(0,2) + " to: " + name);
 		} else {
-			if (isJoke){
-				// If on secondary server, need to adjust print statement to last state that was adjusted
-				System.out.println("<S2> Sent " + jState.substring(jState.length()-2,jState.length()) 
-									+ " to: " + name);
-			}
-			else {
-				// Print that proverb state was adjusted on secondary server
-				System.out.println("<S2> Sent " + pState.substring(pState.length()-2,pState.length())
-					 				+ " to: " + name);
-			}
+			// If on Secondary Server print out standard secondary message
+			System.out.println("<S2> Sent " + message.substring(0,2) + " to: " + name);
 		}
 		
 	}
@@ -237,7 +217,7 @@ class Worker extends Thread
 
 
 	// Get joke string according to state of client
-	static String getJoke(String state, String name, Boolean s2Mode)
+	static String getJoke(String state, String name)
 	{
 		// All the jokes we will use with IDs included in the front
 		String[] jokes = {	"JA : What's brown and sticky? A stick",
@@ -248,18 +228,14 @@ class Worker extends Thread
 		
 		// Get the index of the jokes array to get the joke we will send back to client
 		int index = randomJokeIndex(state);
-		String message = "";
-		if (!s2Mode)
-			message = jokes[index].substring(0,2) + " " + name + jokes[index].substring(2,jokes[index].length());
-		else
-			message = "<S2> " + jokes[index].substring(0,2) + " " + name + jokes[index].substring(2,jokes[index].length());
 
 		// Return the joke string with the name of the user inserted after the Joke ID
-		return message;	}
+		return jokes[index].substring(0,2) + " " + name + jokes[index].substring(2,jokes[index].length());	
+	}
 
 
 	// Get proverb string according to state of client
-	static String getProverb(String state, String name, Boolean s2Mode)
+	static String getProverb(String state, String name)
 	{
 		// All the proverbs we will use with IDs included in the front
 		String[] proverbs = {	"PA : Every now and then a blind pig snorts up a truffle",
@@ -270,14 +246,9 @@ class Worker extends Thread
 
 		// Get the index of the proverbs array to get the proverb we will send back to client
 		int index = randomProverbIndex(state);
-		String message = "";
-		if (!s2Mode)
-			message = proverbs[index].substring(0,2) + " " + name + proverbs[index].substring(2,proverbs[index].length());
-		else
-			message = "<S2> " + proverbs[index].substring(0,2) + " " + name + proverbs[index].substring(2,proverbs[index].length());
 
 		// Return the proverb string with the name of the user inserted after the Proverb ID
-		return message;
+		return proverbs[index].substring(0,2) + " " + name + proverbs[index].substring(2,proverbs[index].length());
 	}	
 }
 
@@ -322,7 +293,7 @@ public class JokeServer
 			while (true) {						// Infinite loop:
 				sock = secondServSock.accept();		// Wait for client connection
 				// Create new Worker thread once client connection is accepted and do code in run() method with start() call
-				new Worker(sock, secondaryJokeMode).start();		
+				new Worker(sock, secondaryJokeMode,true).start();		
 			}
 		}
 
@@ -342,7 +313,7 @@ public class JokeServer
 			while (true) {						// Infinite loop:
 				sock = primaryServSock.accept();		// Wait for client connection
 				// Create new Worker thread once client connection is accepted and do code in run() method with start() call
-				new Worker(sock, primaryJokeMode).start();		
+				new Worker(sock, primaryJokeMode,false).start();		
 			}
 		}
 

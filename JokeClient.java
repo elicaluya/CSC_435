@@ -68,7 +68,7 @@ public class JokeClient
 	static int currentPort = primaryPort;
 
 	static String primaryServer = "";
-	static String s2ServerName = "";
+	static String secondaryServer = "";
 	static String currentServer = primaryServer;
 
 	static String jokeState = "";		// Start out with empty Joke state for new client
@@ -88,7 +88,7 @@ public class JokeClient
 		else if (args.length == 1) primaryServer = args[0];
 		else if (args.length == 2){
 			primaryServer = args[0];
-			s2ServerName = args[1];
+			secondaryServer = args[1];
 			isSecondaryEnabled = true;
 		}
 		else {
@@ -98,7 +98,7 @@ public class JokeClient
 
 		System.out.println("Server one: " + primaryServer + ", Port: " + Integer.toString(primaryPort));
 		if (isSecondaryEnabled)
-			System.out.println("Server two: " + s2ServerName + ", Port: " + Integer.toString(secondaryPort));
+			System.out.println("Server two: " + secondaryServer + ", Port: " + Integer.toString(secondaryPort));
 
 
 		// Initialize the buffer to read in user input
@@ -135,7 +135,7 @@ public class JokeClient
 				}
 				request = in.readLine();
 				if (request.equals("s"))
-					switchSecondary(isSecondaryEnabled);
+					switchSecondary();
 				
 				else if (request.indexOf("quit") < 0)	// Check if string entered is not "quit"
 					sendRequest(name, s2Mode);		// Send request to server to get joke or proverb with current state
@@ -146,24 +146,23 @@ public class JokeClient
 	}
 
 	// Method to switch to secondary mode
-	static void switchSecondary(Boolean isS2)
+	static void switchSecondary()
 	{
-		if (isS2){
-			if (currentServer.equals(primaryServer))
+		if (isSecondaryEnabled){
+			if (s2Mode){
+				s2Mode = false;
 				currentServer = primaryServer;
-			else
-				currentServer = s2ServerName;
-
-			if (currentPort == primaryPort)
-				currentPort = secondaryPort;
-			else
 				currentPort = primaryPort;
+			}
+			else{
+				s2Mode = true;
+				currentServer = secondaryServer;
+				currentPort = secondaryPort;
+			}
+				
 			System.out.println("Now communicating with " + currentServer 
 								+ " port " + Integer.toString(currentPort));
-			if (s2Mode)
-				s2Mode = false;
-			else
-				s2Mode = true;
+			
 		} else 
 			System.out.println("No secondary server being used\n");
 	}
@@ -176,17 +175,13 @@ public class JokeClient
 	{
 		Socket sock;					// Socket variable for connection to server
 		PrintStream toServer;			// PrintStrem variable to store output to the server
-		DataOutputStream s2out;
 
 		try {
 			sock = new Socket(currentServer, currentPort);	// Connect to client at given server name and port
 
 			// Set up output stream to go to the server from the socket
 			toServer = new PrintStream(sock.getOutputStream());
-			s2out = new DataOutputStream(sock.getOutputStream());
-
-			s2out.writeBoolean(isS2);
-			s2out.flush();
+	
 
 			toServer.println(name);			// Send user name to server
 			if (!isS2){
@@ -218,30 +213,34 @@ public class JokeClient
 			messageFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
 			textmessageFromServer = messageFromServer.readLine();	// Store the joke or proverb from server
+
 			if (!s2Mode){
+				// If the output from server is not null, print the joke or proverb on a new line.
+				if (textmessageFromServer != null) System.out.println(textmessageFromServer);
+
 				jokeState = messageFromServer.readLine();				// Store the updated joke state from server
 				proverbState = messageFromServer.readLine();			// Store the updated proverb state from server
+				// If the client finished the primary joke cycle, let client know
+				if (jokeState.length() == 8)
+					System.out.println("PRIMARY JOKE CYCLE COMPLETED! Will get new joke cycle on next JOKE request");
+				// If the client finished the primary proverb cycle, let client know
+				if (proverbState.length() == 8)
+					System.out.println("PRIMARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next PROVERB request");
 			}
 			else {
+				// If the output from server is not null, print the joke or proverb on a new line with secondary server indication.
+				if (textmessageFromServer != null) System.out.println("<S2> " + textmessageFromServer);
+				
 				s2jokeState = messageFromServer.readLine();				// Store the updated joke state from server
 				s2proverbState = messageFromServer.readLine();			// Store the updated proverb state from server
+				// If the client finished the secondary joke cycle, let client know
+				if (s2jokeState.length() == 8)
+					System.out.println("<S2> SECONDARY JOKE CYCLE COMPLETED! Will get new joke cycle on next JOKE request");
+				// If the client finished the secondary proverb cycle, let client know
+				if (s2proverbState.length() == 8)
+					System.out.println("<S2> SECONDARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next PROVERB request");
 			}
-
-			// If the output from server is not null, print the joke or proverb on a new line.
-			if (textmessageFromServer != null) System.out.println(textmessageFromServer);
 			
-			// If the client finished the primary joke cycle, let client know
-			if (jokeState.length() == 8)
-				System.out.println("PRIMARY JOKE CYCLE COMPLETED! Will get new joke cycle on next request");
-			// If the client finished the primary proverb cycle, let client know
-			if (proverbState.length() == 8)
-				System.out.println("PRIMARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next request");
-			// If the client finished the secondary joke cycle, let client know
-			if (s2jokeState.length() == 8)
-				System.out.println("<S2> SECONDARY JOKE CYCLE COMPLETED! Will get new joke cycle on next request");
-			// If the client finished the secondary proverb cycle, let client know
-			if (s2proverbState.length() == 8)
-				System.out.println("<S2> SECONDARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next request");
 			System.out.println();
 
 	

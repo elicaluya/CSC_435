@@ -108,20 +108,20 @@ public class JokeClientAdmin
 			do {
 				if (!s2Mode){
 					if (primaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
-						System.out.println("Current Mode is JOKE MODE");
+						System.out.println("Current PRIMARY Server Mode is JOKE MODE");
 						System.out.println("Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}	
 					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
-						System.out.println("Current Mode is PROVERB MODE");
+						System.out.println("Current PRIMARY Server Mode is PROVERB MODE");
 						System.out.println("Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}
 				} else {
 					if (secondaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
-						System.out.println("<S2> Current Mode is JOKE MODE");
+						System.out.println("<S2> Current SECONDARY Server Mode is JOKE MODE");
 						System.out.println("<S2> Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}	
 					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
-						System.out.println("<S2> Current Mode is PROVERB MODE");
+						System.out.println("<S2> Current SECONDARY Server Mode is PROVERB MODE");
 						System.out.println("<S2> Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}
 				}
@@ -142,21 +142,19 @@ public class JokeClientAdmin
 	static void switchSecondary()
 	{
 		if (isSecondaryEnabled){
-			if (currentServer.equals(primaryServer))
-				currentServer = primaryServer;
-			else
-				currentServer = secondaryServer;
-
-			if (currentPort == primaryPort)
-				currentPort = secondaryPort;
-			else
-				currentPort = primaryPort;
-			System.out.println("Now communicating with " + currentServer 
-								+ " port " + Integer.toString(currentPort)+ "\n");
-			if (s2Mode)
+			if (s2Mode){
 				s2Mode = false;
-			else
+				currentServer = primaryServer;
+				currentPort = primaryPort;
+			}
+			else{
 				s2Mode = true;
+				currentServer = secondaryServer;
+				currentPort = secondaryPort;
+			}
+			System.out.println("Now communicating with " + currentServer 
+								+ " port " + Integer.toString(currentPort));
+
 		} else 
 			System.out.println("No secondary server being used\n");
 	}
