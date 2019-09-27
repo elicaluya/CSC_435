@@ -11,7 +11,6 @@ e.g. build 1.8.0_222-b10
 e.g.:
 
 > javac JokeClientAdmin.java
-> java JokeClientAdmin
 
 
 4. Precise examples / instructions to run this program:
@@ -20,36 +19,36 @@ e.g.:
 
 In separate shell windows:
 
-> java JokeServer
-> java JokeClient
 > java JokeClientAdmin
-
-All acceptable commands are displayed on the various consoles.
-
-This runs across machines, in which case you have to pass the IP address of
-the server to the clients. For exmaple, if the server is running at
-140.192.1.22 then you would type:
-
-> java JokeClient 140.192.1.22
+or 
 > java JokeClientAdmin 140.192.1.22
+	- Will run the Joke Client Admin on localhost and will try to connect with server at this address if no argument is given
+	- Otherwise will try to connect to server on address given in first argument i.e. 140.192.1.22
+	- will connect to only the primary server on port 5050.
+
+> java JokeClientAdmin localhost 140.192.1.22
+	- Will run the joke client and try to connect to primary server on first argument on port 5050 i.e. localhost
+	- Will run the joke client and try to connect to secondary server on second argument on port 5051 i.e. 140.192.1.22
+	- Can connect to primary server on port 5050 and secondary server on 5051
 
 5. List of files needed for running the program.
 
 e.g.:
 
- a. checklist.html
- b. JokeServer.java
- c. JokeClient.java
- d. JokeClientAdmin.java
+ a. JokeServer.java
+ b. JokeClient.java
+ c. JokeClientAdmin.java
 
 5. Notes:
 
 e.g.:
 
-I faked the random number generator. I have a bug that comes up once every
-ten runs or so. If the server hangs, just kill it and restart it. You do not
-have to restart the clients, they will find the server again when a request
-is made.
+The Joke Client Admin will connect to only the primary server at localhost on port 5050 if no argument is given.
+If there is one argument given, then the Joke Client Admin will try to connect with the primary server at the argument given on port 5050.
+If two arguments are entered, then the joke client admin will try to connect to the primary server at that first argument given on port 5050
+and to the secondary server at the second argument given on port 5051. After starting the program, the user can change the state of the current
+server the client admin is connected to by pressing enter. This will change the server mode to proverb or joke mode. The user can 
+switch between the primary and secondary server by entering 's' and quit the program at any time by entering 'quit'.
 
 ----------------------------------------------------------*/
 
@@ -69,33 +68,35 @@ public class JokeClientAdmin
 	static int secondaryPort = 5051;		// Secondary server port to connect to server
 	static int currentPort = primaryPort;
 
-	static String primaryServer = "";				// String to hold primary server for client admin
-	static String secondaryServer = "";				// String to hold secondary server for client admin
-	static String currentServer = primaryServer;	// By default set current server to primary server
+	static String primaryServer = "";					// String to hold primary server for client admin
+	static String secondaryServer = "";					// String to hold secondary server for client admin
+	static String currentServer = primaryServer;		// By default set current server to primary server
 
-	static Boolean primaryJokeMode = true;			// By default, primary server starts out in Joke Mode
-	static Boolean secondaryJokeMode = true;		// By default, secondary server starts out in Proverb mode
-	static Boolean currentJokeMode = primaryJokeMode;
+	static Boolean primaryJokeMode = true;				// By default, primary server starts out in Joke Mode
+	static Boolean secondaryJokeMode = true;			// By default, secondary server starts out in Proverb mode
+	static Boolean currentJokeMode = primaryJokeMode;	// By default the current server is the primary server
 
-	static Boolean isSecondaryEnabled = false;		// Secondary server access is not enabled at default
-	static Boolean s2Mode = false;					// Value to determine if sending info to secondary or primary server
+	static Boolean isSecondaryEnabled = false;			// Secondary server access is not enabled at default
+	static Boolean s2Mode = false;						// Value to determine if sending info to secondary or primary server
 
 	public static void main (String args[])
 	{
-		// If User doesn't provide a server name in arguments, then set servername to localhost
+		// If User doesn't provide a server name in arguments, then set the primary server to localhost
 		if (args.length < 1) primaryServer = "localhost";
-		else if (args.length == 1) primaryServer = args[0];
-		else if (args.length == 2) {
-			primaryServer = args[0];
-			secondaryServer = args[1];
-			isSecondaryEnabled = true;
+		else if (args.length == 1) primaryServer = args[0];	// If one argument given, set the primary server to this address
+		else if (args.length == 2) {		// If a second argument is given then set the primary and secondary servers
+			primaryServer = args[0];		// Set the primary server to the first argument
+			secondaryServer = args[1];		// Set the secondary server to the second argument
+			isSecondaryEnabled = true;		// Enable secondary server functionality
 		} else {
+			// If there are too many arguments then alert the user and stop the program
 			System.out.println("Too many Arguments! JokeClientAdmin takes 1, 2, or no arguments.");
 			System.exit(0);
 		}
 
+		// Display the servers and ports being used
 		System.out.println("Server one: " + primaryServer + ", port: " + Integer.toString(primaryPort));
-		if (isSecondaryEnabled)
+		if (isSecondaryEnabled)		// If secondary functionality is enabled then display the second server and port
 			System.out.println("Server one: " + secondaryServer + ", port: " + Integer.toString(secondaryPort));
 
 		
@@ -107,30 +108,30 @@ public class JokeClientAdmin
 			String input;
 			do {
 				if (!s2Mode){
-					if (primaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
+					if (primaryJokeMode){	//Declare to client admin that the current primary server mode is Joke Mode and prompt to change to Proverb mode
 						System.out.println("Current PRIMARY Server Mode is JOKE MODE");
 						System.out.println("Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}	
-					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
+					else{	//Declare to client admin that the current primary server mode is Proverb Mode and prompt to change to Joke mode
 						System.out.println("Current PRIMARY Server Mode is PROVERB MODE");
 						System.out.println("Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}
 				} else {
-					if (secondaryJokeMode){	//Declare to client admin that the current mode is Joke Mode and prompt to change to Proverb mode
+					if (secondaryJokeMode){	//Declare to client admin that the secondary server current mode is Joke Mode and prompt to change to Proverb mode
 						System.out.println("<S2> Current SECONDARY Server Mode is JOKE MODE");
 						System.out.println("<S2> Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}	
-					else{	//Declare to client admin that the current mode is Proverb Mode and prompt to change to Joke mode
+					else{	//Declare to client admin that the current secondary server mode is Proverb Mode and prompt to change to Joke mode
 						System.out.println("<S2> Current SECONDARY Server Mode is PROVERB MODE");
 						System.out.println("<S2> Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client");
 					}
 				}
-				
+				System.out.flush();
 
 				// Every time the user presses enter, the mode is changed on the server
 				input = in.readLine();	// Get input from user
-				if (input.equals("s"))
-					switchSecondary();
+				if (input.equals("s"))	// if the user wants to switch between secondary and primary server
+					switchSecondary();	// Inititate the switching of which server to communicate with
 				else if (input.indexOf("quit") < 0)	// Check if string entered is not "quit"
 					changeMode(s2Mode);	// If not quit, call changeMode() method to change mode of server
 			// While the input is not quit, keep reading in line and sending info to server
@@ -139,23 +140,25 @@ public class JokeClientAdmin
 		} catch (IOException x) {x.printStackTrace();}		// Print data in output console
 	}
 
+	// Method to switch between communicating to secondary and primary server
 	static void switchSecondary()
 	{
-		if (isSecondaryEnabled){
-			if (s2Mode){
+		if (isSecondaryEnabled){	// Check if the secondary functionality is enabled
+			if (s2Mode){			// If it is in Secondary mode, then switch everything to the primary server
 				s2Mode = false;
 				currentServer = primaryServer;
 				currentPort = primaryPort;
 			}
-			else{
+			else{					// If it is in primary mode, then switch everything to the secondary server
 				s2Mode = true;
 				currentServer = secondaryServer;
 				currentPort = secondaryPort;
 			}
-			System.out.println("Now communicating with " + currentServer 
+			// Let user know of the current server and port that they are communicating with
+			System.out.println("Now communicating with " + currentServer 		
 								+ " port " + Integer.toString(currentPort));
 
-		} else 
+		} else 	// If secondary functionality is not enabled then let the user know
 			System.out.println("No secondary server being used\n");
 	}
 
@@ -171,19 +174,19 @@ public class JokeClientAdmin
 		
 
 		try {
-			sock = new Socket(currentServer, currentPort);	// Connect to client at given server name and port
+			sock = new Socket(currentServer, currentPort);	// Connect to server at the current server name and port
 
-			// Set the input stream to read in from the socket
+			// Set the input stream to read in String from the socket
 			fromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			// Set up output stream to send boolean value to server
 			toServer = new DataOutputStream(sock.getOutputStream());
 
 
-			if (!isS2){
-				toServer.writeBoolean(isS2);
+			if (!isS2){		// Check if communicating to secondary or primary server
+				toServer.writeBoolean(isS2);				// Send to server if communicated through secondary or primary server
 				toServer.writeBoolean(!primaryJokeMode);	// Send boolean value to server of the mode we want to change the server to
 				toServer.flush();	// Flush output stream
-				// Update the saved mode on the client admin
+				// Update the saved primary mode on the client admin
 				if (primaryJokeMode)
 					primaryJokeMode = false;
 				else
@@ -194,22 +197,21 @@ public class JokeClientAdmin
 				if (textFromPrimaryServer != null) System.out.println(textFromPrimaryServer);
 			}
 			else{
-				toServer.writeBoolean(isS2);
+				toServer.writeBoolean(isS2);				// Send to server if communicated through secondary or primary server
 				toServer.writeBoolean(!secondaryJokeMode);	// Send boolean value to server of the mode we want to change the server to
 				toServer.flush();	// Flush output stream
-				// Update the saved mode on the client admin
+				// Update the saved secondary mode on the client admin
 				if (secondaryJokeMode)
 					secondaryJokeMode = false;
 				else
 					secondaryJokeMode = true;
 
 				String textFromSecondaryServer = fromServer.readLine();		// Read in update from server that server mode has changed
-				// If the output from server is not null, print the output on a new line.
+				// If the output from server is not null, print the output on a new line with secondary server indicator.
 				if (textFromSecondaryServer != null) System.out.println("<S2> " + textFromSecondaryServer);
 			}
 			
-			
-			System.out.println();
+			System.out.println();	// For easier to read output
 			
 			// Close connection with server
 			sock.close();

@@ -11,7 +11,6 @@ e.g. build 1.8.0_222-b10
 e.g.:
 
 > javac JokeClient.java
-> java JokeClient
 
 
 4. Precise examples / instructions to run this program:
@@ -20,36 +19,41 @@ e.g.:
 
 In separate shell windows:
 
-> java JokeServer
 > java JokeClient
-> java JokeClientAdmin
-
-All acceptable commands are displayed on the various consoles.
-
-This runs across machines, in which case you have to pass the IP address of
-the server to the clients. For exmaple, if the server is running at
-140.192.1.22 then you would type:
-
+or 
 > java JokeClient 140.192.1.22
-> java JokeClientAdmin 140.192.1.22
+	- Will run the Joke Client on localhost and will try to connect with server at this address if no argument is given
+	- Otherwise will try to connect to server on address given in first argument i.e. 140.192.1.22
+	- will connect to only the primary server on port 4545.
+
+> java JokeClient localhost 140.192.1.22
+	- Will run the joke client and try to connect to primary server on first argument on port 4545 i.e. localhost
+	- Will run the joke client and try to connect to secondary server on second argument on port 4546 i.e. 140.192.1.22
+	- Can connect to primary server on port 4545 and secondary server on 4546
+
 
 5. List of files needed for running the program.
 
 e.g.:
 
- a. checklist.html
- b. JokeServer.java
- c. JokeClient.java
- d. JokeClientAdmin.java
+ a. JokeServer.java
+ b. JokeClient.java
+ c. JokeClientAdmin.java
+
 
 5. Notes:
 
 e.g.:
 
-I faked the random number generator. I have a bug that comes up once every
-ten runs or so. If the server hangs, just kill it and restart it. You do not
-have to restart the clients, they will find the server again when a request
-is made.
+The Joke client will connect to the primary server at localhost on port 4545 if no argument given.
+If one argument given, the joke client will connect to primary server at the address of the argument entered on port 4545.
+If a second argument is given, the joke client will be able to connect to the secondary server at the address of the
+second address entered on port 4546. After the user enters their name, they will be able to send requests to the primary or
+secondary server by pressing the <Enter> button and sending over the name the user entered, and the current joke and proverb state.
+The client receives the proper joke or proverb from the joke server and the updated joke and proverb state.
+The client maintains a primary and secondary joke and proverb state that are independent of each other. The client is able to
+switch who to send requests to by entering 's'. This will switch the address and port that the client sends a request to.
+The client can stop the program at anything by entering 'quit'.
 
 ----------------------------------------------------------*/
 
@@ -58,18 +62,18 @@ import java.io.*; 	// For Input and Ouput
 import java.net.*;	// For Java networking libraries
 
 
-/*******************************************************************************************************************/
-// 					Client class for user to connect with server and get joke or proverb
-/*******************************************************************************************************************/
+/******************************************************************************************************************************************************************/
+// 											Client class for user to connect with server and get joke or proverb
+/******************************************************************************************************************************************************************/
 public class JokeClient 
 {
 	static int primaryPort = 4545;			// Primary server port to connect with
 	static int secondaryPort = 4546; 		// Secondary server port to connect with
-	static int currentPort = primaryPort;
+	static int currentPort = primaryPort;	// Set default current port to the primary port
 
-	static String primaryServer = "";
-	static String secondaryServer = "";
-	static String currentServer = primaryServer;
+	static String primaryServer = "";				// Variable to store the primary server to communicate to primary joke server with
+	static String secondaryServer = "";				// Variable to store the secondary server to communicate to secondary joke server with
+	static String currentServer = primaryServer;	// Default current server to primary server
 
 	static String jokeState = "";		// Start out with empty Joke state for new client
 	static String proverbState = "";	// Start out with empty Proverb state for new client
@@ -82,22 +86,22 @@ public class JokeClient
 
 	public static void main (String args[])
 	{
-		
 		// If User doesn't provide a server name in arguments, then set servername to localhost
 		if (args.length < 1) primaryServer = "localhost";
-		else if (args.length == 1) primaryServer = args[0];
-		else if (args.length == 2){
-			primaryServer = args[0];
-			secondaryServer = args[1];
-			isSecondaryEnabled = true;
+		else if (args.length == 1) primaryServer = args[0];		// If one argument entered, set primary server to the argument
+		else if (args.length == 2){			// If the user entered 2 arguments for secondary server functionality
+			primaryServer = args[0];		// set primary server to the first argument
+			secondaryServer = args[1];		// set secondary server to the second argument
+			isSecondaryEnabled = true;		// Enable secondary server functionality
 		}
-		else {
+		else {		// If user entered too many arguments, alert user then exit the program
 			System.out.println("Too many Arguments! JokeClient takes 1, 2, or no arguments.");
 			System.exit(0);
 		}
 
+		// Display all of the servers being used
 		System.out.println("Server one: " + primaryServer + ", Port: " + Integer.toString(primaryPort));
-		if (isSecondaryEnabled)
+		if (isSecondaryEnabled)		// If secondary server functionality is enabled, display the second server
 			System.out.println("Server two: " + secondaryServer + ", Port: " + Integer.toString(secondaryPort));
 
 
@@ -105,10 +109,17 @@ public class JokeClient
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		String name = "";	// String variable to store name the user enters
 
-		// Get name in from user and store in variable "name"
+		// First read and store in name before entering loop to connect with server
 		try {
 			System.out.println("Enter your name, or 'quit' to stop the program: ");
 			name = in.readLine();
+			if (name.equals("")){	// Keep asking user for a name if the user did not enter anything
+				do {
+					System.out.println("You must enter a name");
+					name = in.readLine();
+				} while (name.equals(""));
+			}
+			
 		} catch (IOException i){
 			System.out.println(i);
 		}
@@ -123,19 +134,21 @@ public class JokeClient
 		try {
 			String request;
 			do {
-				if(!s2Mode){
+				// Display which server is being used and the prompt for the user
+				if(!s2Mode){	// Check if the secondary server is being used or not
 					System.out.println("Current server: PRIMARY");
-					System.out.print("Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: ");	
-					System.out.flush();				// Make sure everything written to Standard out is sent
+					System.out.print("Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: ");					
 				}
 				else {
+					// Display with secondary server indicator
 					System.out.println("<S2> Current server: SECONDARY");
 					System.out.print("<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: ");	
-					System.out.flush();				// Make sure everything written to Standard out is sent
 				}
-				request = in.readLine();
-				if (request.equals("s"))
-					switchSecondary();
+				System.out.flush();				// Make sure everything written to Standard out is sent
+
+				request = in.readLine();		// Get request in from the user
+				if (request.equals("s"))		// If the user wants to switch between primary and secondary server
+					switchSecondary();			// Initiate method to switch to primary or secondary server
 				
 				else if (request.indexOf("quit") < 0)	// Check if string entered is not "quit"
 					sendRequest(name, s2Mode);		// Send request to server to get joke or proverb with current state
@@ -148,29 +161,30 @@ public class JokeClient
 	// Method to switch to secondary mode
 	static void switchSecondary()
 	{
-		if (isSecondaryEnabled){
-			if (s2Mode){
+		if (isSecondaryEnabled){	// Check if secondary server functionality is enabled
+			if (s2Mode){				// if in secondary mode, change the current server and port to primary mode
 				s2Mode = false;
 				currentServer = primaryServer;
 				currentPort = primaryPort;
-			}
-			else{
+			}						
+			else{						// if in primary mode, change the current server and port to secondary mode
 				s2Mode = true;
 				currentServer = secondaryServer;
 				currentPort = secondaryPort;
 			}
 				
+			// Display that the client is communicating with a different server and port
 			System.out.println("Now communicating with " + currentServer 
 								+ " port " + Integer.toString(currentPort));
 			
-		} else 
-			System.out.println("No secondary server being used\n");
+		} else 	// if secondary server functionality is not available then let the user know
+			System.out.println("No secondary server being used");
 	}
 
 
-	/*******************************************************************************************************************/
-	// 				Main method used to send request to server with user name, joke state, and proverb state
-	/*******************************************************************************************************************/	
+	/******************************************************************************************************************************************************************/
+	// 											Main method used to send request to server with user name, joke state, and proverb state
+	/******************************************************************************************************************************************************************/	
 	static void sendRequest(String name, Boolean isS2)
 	{
 		Socket sock;					// Socket variable for connection to server
@@ -200,9 +214,9 @@ public class JokeClient
 	}
 
 
-	/*******************************************************************************************************************/
-	// 		Main method used to get info back from server including joke or proverb, joke state, and proverb state
-	/*******************************************************************************************************************/	
+	/******************************************************************************************************************************************************************/
+	// 									Main method used to get info back from server including joke or proverb, joke state, and proverb state
+	/******************************************************************************************************************************************************************/	
 	static void getMessage(Socket sock)
 	{
 		BufferedReader messageFromServer;		// Buffer variable to store output from server
@@ -214,7 +228,9 @@ public class JokeClient
 
 			textmessageFromServer = messageFromServer.readLine();	// Store the joke or proverb from server
 
-			if (!s2Mode){
+			
+
+			if (!s2Mode){	// Check whether we are updating primary or secondary joke and proverb states
 				// If the output from server is not null, print the joke or proverb on a new line.
 				if (textmessageFromServer != null) System.out.println(textmessageFromServer);
 
@@ -228,9 +244,9 @@ public class JokeClient
 					System.out.println("PRIMARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next PROVERB request");
 			}
 			else {
-				// If the output from server is not null, print the joke or proverb on a new line with secondary server indication.
+				// If the output from server is not null, print the joke or proverb on a new line.
 				if (textmessageFromServer != null) System.out.println("<S2> " + textmessageFromServer);
-				
+
 				s2jokeState = messageFromServer.readLine();				// Store the updated joke state from server
 				s2proverbState = messageFromServer.readLine();			// Store the updated proverb state from server
 				// If the client finished the secondary joke cycle, let client know
@@ -241,7 +257,7 @@ public class JokeClient
 					System.out.println("<S2> SECONDARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next PROVERB request");
 			}
 			
-			System.out.println();
+			System.out.println();	// For easier to read output
 
 	
 			// Close connection with server
