@@ -1,0 +1,325 @@
+*** This is the output of running the primary JokeServer, Secondary JokeServer, JokeClientAdmin, and two JokeClients named Person 1 and 2
+*** This output shows that the server will send the jokes and proverbs to the clients in a random order for each client
+*** It also shows that the modes can be switched between PROVERB and JOKE for both the primary and secondary server with the JokeClientAdmin
+*** I couldn't find a clean way to print the outputs so I individually output the files to their respective txt files using: > Log.txt for each file
+*** I then copy and pasted the output into this txt file to show the chronological process of when each server is sending info, when the client receives info, when the modes are changed, and the switching between primary and secondary servers for both JokeCLientAdmin and JokeClient.
+
+
+
+
+
+
+* primary server starts up
+Elijah Caluya's Primary Joke server 1.8 starting up, listening at port 4545
+
+
+* Secondary server starts up
+Elijah Caluya's Secondary Joke server 1.8 starting up, listening at port 4546
+
+
+* JokeClientAdmin starts up
+Server one: localhost, port: 5050
+Server one: 127.0.0.1, port: 5051
+Current PRIMARY Server Mode is JOKE MODE
+Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client
+
+
+* Person 1 client starts up
+Server one: localhost, Port: 4545
+Server two: 127.0.0.1, Port: 4546
+Enter your name, or 'quit' to stop the program:
+Person 1 
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sends JD to Person 1
+Sent JD to: Person 1
+
+
+* Person 1 receives JD
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JD Person 1 : Why do we tell actors to 'break a leg'? Because every play has a cast
+
+Sent JB to: Person 1
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JB Person 1 : A blind person was eating seafood. It didn't help
+
+
+* Person 2 client starts up
+Server one: localhost, Port: 4545
+Server two: 127.0.0.1, Port: 4546
+Enter your name, or 'quit' to stop the program: 
+Person 2
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sends JC to Person 2
+Sent JC to Person 2
+
+
+* Person 2 receives JC
+JC Person 2 : I invented a new word! Plagiarism!
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sens JA to Person 1
+Sent JA to: Person 1
+
+
+* Person 1 receives JA
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JA Person 1 : What's brown and sticky? A stick
+
+
+* Primary server sends JC to Person 1
+Sent JC to: Person 1
+
+
+* Person 1 receives JC
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JC Person 1 : I invented a new word! Plagiarism!
+PRIMARY JOKE CYCLE COMPLETED! Will get new joke cycle on next JOKE request
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sends JA to Person 1 with new Joke cycle
+JOKE CYCLE COMPLETED! Resetting jokes for Person 1
+Sent JA to: Person 1
+
+
+* Person 1 receives JA with new joke cycle
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JA Person 1 : What's brown and sticky? A stick
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sends JD
+Sent JD to: Person 2
+
+
+* PPerson 2 receives JD
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JD Person 2 : Why do we tell actors to 'break a leg'? Because every play has a cast
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary server sends JB to Person 2
+Sent JB to: Person 2
+
+
+* Person 2 receives JB
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JB Person 2 : A blind person was eating seafood. It didn't help
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Primary Server sends JA to Person 2
+Sent JA to: Person 2
+
+
+* Person 2 joke cycle is complete, will receive new cycle on next request
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JA Person 2 : What's brown and sticky? A stick
+PRIMARY JOKE CYCLE COMPLETED! Will get new joke cycle on next JOKE request
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* On Primary server, sends JA to Person 2 with new joke cycle
+JOKE CYCLE COMPLETED! Resetting jokes for Person 2
+Sent JA to: Person 2
+
+* Person 2 receives JA in new cycle
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+JA Person 2 : What's brown and sticky? A stick
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Person 1 switches to secondary server and gets a request
+Now communicating with 127.0.0.1 port 4546
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Secondary server sends JA to Person 1
+<S2> Sent JA to: Person 1
+
+
+* Person 1 receives JA
+<S2> JA Person 1 : What's brown and sticky? A stick
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Secondary server sends JB
+<S2> Sent JB to: Person 1
+
+
+* Person 1 receives JB
+<S2> JB Person 1 : A blind person was eating seafood. It didn't help
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Person 2 switches to secondary server
+Now communicating with 127.0.0.1 port 4546
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program:
+
+* Secondary server sends JA to person 2
+<S2> Sent JA to: Person 2
+
+* Person 2 receives JA
+<S2> JA Person 2 : What's brown and sticky? A stick
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program:
+
+
+* Secondary server sends JB to person 2
+<S2> Sent JB to: Person 2
+
+
+* Person 2 receives JB
+<S2> JB Person 2 : A blind person was eating seafood. It didn't help
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* JokeClientAdmin switches primary mode to PROVERB
+Current PRIMARY Server Mode is PROVERB MODE
+Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client
+
+
+* Server states mode was changed
+Primary Server set to Joke Mode
+
+
+* Person 2 switches back to primary
+Now communicating with localhost port 4545
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program:
+
+
+* Primary server sends PB to Person 2
+Sent PB to: Person 2
+
+
+* Person 2 receives PB
+PB Person 2 : A bad workman always blames his tools
+
+Current server: PRIMARY
+Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* JokeClientAdmin switches to secondary server
+Now communicating with 127.0.0.1 port 5051
+<S2> Current SECONDARY Server Mode is JOKE MODE
+<S2> Press <Enter> to change to PROVERB mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client
+
+
+* JokeClientAdmin changes secondary mode to PROVERB
+<S2> Current SECONDARY Server Mode is PROVERB MODE
+<S2> Press <Enter> to change to JOKE mode, 's' to switch between primary/secondary server, or 'quit' to stop admin client
+
+
+* Secondary server states that mode has been changed
+<S2> Secondary Server set to Proverb Mode
+
+
+* Secondary server sends PB to Person 1
+<S2> Sent PB to: Person 1
+
+
+* Person 1 receives PB
+<S2> PB Person 1 : A bad workman always blames his tools
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program:
+
+
+* Secondary server sends PD to Person 1
+<S2> Sent PD to: Person 1
+
+
+* Person 1 receives PD
+<S2> PD Person 1 : Don't bite the hand that feeds you
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Secondary server sends PC to Person 1
+<S2> Sent PC to: Person 1
+
+
+* Person 1 receives PC
+<S2> PC Person 1 : An idle brain is the devil's workshop
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Secondary server sends PA to person 1
+<S2> Sent PA to: Person 1
+
+
+* Person 1 receives PA and prompted that proverb cycle is complete
+<S2> PA Person 1 : Every now and then a blind pig snorts up a truffle
+<S2> SECONDARY PROVERB CYCLE COMPLETED! Will get new proverb cycle on next PROVERB request
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program:
+
+
+* Secondary server sends PB to person 1 with new Proverb cycle
+<S2> PROVERB CYCLE COMPLETED! Resetting proverbs for Person 1
+<S2> Sent PB to: Person 1
+
+
+* Person 1 receives PB
+<S2> PB Person 1 : A bad workman always blames his tools
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 
+
+
+* Secondary server sends PC to Person 1
+<S2> Sent PC to: Person 1
+
+
+* Person 1 receives PC
+<S2> PC Person 1 : An idle brain is the devil's workshop
+
+<S2> Current server: SECONDARY
+<S2> Press <Enter> to get message, 's' to switch between primary/secondary server, or 'quit' to stop program: 

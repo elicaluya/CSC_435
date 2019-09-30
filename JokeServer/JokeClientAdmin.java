@@ -62,8 +62,8 @@ import java.net.*;	// For Java networking libraries
 /*******************************************************************************************************************/
 public class JokeClientAdmin 
 {
-
-	
+	// Have the ports and server names easily accessible by making them static.
+	// If I had to improve this program I would try and create less static variables in the future.
 	static int primaryPort = 5050;			// Primary server port to connect to server
 	static int secondaryPort = 5051;		// Secondary server port to connect to server
 	static int currentPort = primaryPort;
@@ -72,14 +72,20 @@ public class JokeClientAdmin
 	static String secondaryServer = "";					// String to hold secondary server for client admin
 	static String currentServer = primaryServer;		// By default set current server to primary server
 
+	// Store the states on the client so we can just send a boolean value over to the server.
+	// By default the server starts out in Joke mode and will change to proverb mode.
+	// However, if the mode is changed and the JokeClientAdmin is stopped and restarted, the client admin will want to change the
+	// server mode to proverb mode by default. It will let the user know what the mode will be changed to and what the current mode is
 	static Boolean primaryJokeMode = true;				// By default, primary server starts out in Joke Mode
 	static Boolean secondaryJokeMode = true;			// By default, secondary server starts out in Proverb mode
 	static Boolean currentJokeMode = primaryJokeMode;	// By default the current server is the primary server
 
+	// Boolean values for secondary server functionality
 	static Boolean isSecondaryEnabled = false;			// Secondary server access is not enabled at default
 	static Boolean s2Mode = false;						// Value to determine if sending info to secondary or primary server
 
-	public static void main (String args[])
+
+	public static void main (String args[]) throws FileNotFoundException 
 	{
 		// If User doesn't provide a server name in arguments, then set the primary server to localhost
 		if (args.length < 1) primaryServer = "localhost";
@@ -170,6 +176,7 @@ public class JokeClientAdmin
 	{
 		Socket sock;					// Socket variable for connection to server
 		BufferedReader fromServer;		// Buffer variable to store output from server
+		// Usage for DataOutputStream obtained through https://docs.oracle.com/javase/7/docs/api/java/io/DataOutputStream.html
 		DataOutputStream toServer;		// PrintStrem variable to store output to the server
 		
 

@@ -216,6 +216,7 @@ class Worker extends Thread
 	static String getJoke(String state, String name)
 	{
 		// All the jokes we will use with IDs included in the front
+		// Jokes taken from: http://laffgaff.com/funny-short-jokes/
 		String[] jokes = {	"JA : What's brown and sticky? A stick",
 							"JB : A blind person was eating seafood. It didn't help",
 							"JC : I invented a new word! Plagiarism!",
@@ -234,6 +235,7 @@ class Worker extends Thread
 	static String getProverb(String state, String name)
 	{
 		// All the proverbs we will use with IDs included in the front
+		// Proverbs taken from: https://lemongrad.com/proverbs-with-meanings-and-examples/
 		String[] proverbs = {	"PA : Every now and then a blind pig snorts up a truffle",
 								"PB : A bad workman always blames his tools",
 								"PC : An idle brain is the devil's workshop",
@@ -337,6 +339,7 @@ class AdminWorker extends Thread
 	public void run()
 	{
 		// Input and output streams for getting info from client
+		// Usage for DataInputStream obtained from https://docs.oracle.com/javase/7/docs/api/java/io/DataInputStream.html
 		DataInputStream fromClient;
 		PrintStream toClient;
 
@@ -382,7 +385,7 @@ class AdminWorker extends Thread
 			sock.close();
 			}
 		} catch (IOException i){
-			System.out.println(i);
+			System.out.println(i);	// Print out the exception
 		}
 	}
 }
@@ -405,7 +408,7 @@ class JokeAdmin implements Runnable
 				sock = servsock.accept();		// Accept connections from JokeClientAdmin
 				new AdminWorker(sock).start();	// Start new thread each time JokeClientAdmin connects to primary server
 			}
-		} catch (IOException i) {System.out.println(i);}
+		} catch (IOException i) {System.out.println(i);}	// Print out the exception
 		
 	}
 }
@@ -427,7 +430,7 @@ class JokeAdminSecondary implements Runnable
 				sock = servsock.accept();		// Accept connections from JokeClientAdmin
 				new AdminWorker(sock).start();	// Start new thread each time JokeClientAdmin connects to secondary server
 			}
-		} catch (IOException i) {System.out.println(i);}
+		} catch (IOException i) {System.out.println(i);}	// Print out the Exception
 		
 	}
 }

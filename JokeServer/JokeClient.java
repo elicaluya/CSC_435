@@ -67,6 +67,8 @@ import java.net.*;	// For Java networking libraries
 /******************************************************************************************************************************************************************/
 public class JokeClient 
 {
+	// Have the ports and server names easily accessible by making them static.
+	// If I had to improve this program I would try and create less static variables in the future.
 	static int primaryPort = 4545;			// Primary server port to connect with
 	static int secondaryPort = 4546; 		// Secondary server port to connect with
 	static int currentPort = primaryPort;	// Set default current port to the primary port
@@ -75,12 +77,14 @@ public class JokeClient
 	static String secondaryServer = "";				// Variable to store the secondary server to communicate to secondary joke server with
 	static String currentServer = primaryServer;	// Default current server to primary server
 
+	// Have each client's state for primary and secondary jokes and proverbs stored on the client.
+	// This way, it eliminates the need for a UUID and the states can be easily adjusted and kept track of by checking against the strings
 	static String jokeState = "";		// Start out with empty Joke state for new client
 	static String proverbState = "";	// Start out with empty Proverb state for new client
-
 	static String s2jokeState = "";		// Start out with empty secondary joke state
 	static String s2proverbState = "";	// Start out with empty secondary proverb state
 
+	// Boolean values for secondary server functionality
 	static Boolean isSecondaryEnabled = false;	// Value to check if user wants to connect to second server
 	static Boolean s2Mode = false;				// Switches between primary and secondary mode to send request to primary or secondary server
 
@@ -121,7 +125,7 @@ public class JokeClient
 			}
 			
 		} catch (IOException i){
-			System.out.println(i);
+			System.out.println(i);	// Print out exception 
 		}
 
 		// If the user wants to quit the program before entering their name
