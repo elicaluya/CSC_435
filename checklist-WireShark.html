@@ -74,12 +74,12 @@ Yes                    </b></td></tr>
 <tr> <td align="left"><b>
 I have inserted my one-page write-up into the bottom of the checklist.
 </b></td><td align="left"><b>
-No          </b></td></tr>
+Yes          </b></td></tr>
 
 <tr> <td align="left"><b>
 I will have submitted this checklist to D2L
 </b></td><td align="left"><b>
-No          </b></td></tr>
+Yes          </b></td></tr>
 
 <tr> <td align="left"><b>
 Bragging Rights Below ---------------------
@@ -95,16 +95,21 @@ No          </b></td></tr>
 
 <h3> My One Page Writeup: </h3>
 
-<pre>
-[Insert your one-page write-up here. What did you do?]
-</pre>
-
-You can also use this format:<p>
-
-Paragraph one <p>
-
-Paragraph two <p>
-
-etc.
+<p>
+	For the first wireshark intro lab, I mostly used my time in getting familiar with wireshark because i have never used a tool like it before. one of the first exercises for the lab was to capture packets by visiting any website that I wanted. I chose www.google.com and at first had some trouble in seeing the information that was being sent back and forth. For some reason wireshark would always say that it did not capture any packets, but after a few tries I was finally able to see data. Like the lab suggested, I got familiar with the different windows and ways to filter the data on wireshark. A common difficulty I had in all the labs was the fact that the labs were all using an older version of wireshark so some of the settings were not where the lab described them to be and I had to put extra effort into finding what the lab was describing. In short, for all the required labs I was able to follow the instructions and do my best to find the information that it was asking for. Even though I did not record the answers I answered them to the best of my ability.
+<p>
+	For the IP lab, Pingplotter and wireshark were both utilized heavily. I recall also having some trouble with pingplotter at first because some of the intructions and examples used in the lab were kind of outdated and it took me some time to find the setting they were talking about or just try and replicate the example without the setting. For example, the lab wanted me to enter 3 as the number of times to trace but I could not find this setting so I just watched the pingplotter until it counted 3 times and then I ended the trace. I found this lab interesting because I would change the size of the packets sent in the pingplotter and then I could see in wireshark where and when these large sized packets were sent. From there, I could look into detail at the specific entries in wireshark to find more specific details about my machine and the data sent back and forth between networks.
+<p>
+	The DNS lab was one that I was familiar with because in my current job, I use nslookup and ipconfig a lot. In my current job I mainly use nslookup to find out the IP address of certain hostnames and ipconfig for the same function but less frequently. I did find this lab interesting because I learned more commands for nslookup and ipconfig that I have not used before like "/flushdns" for ipconfig. Wireshark was utilized similarly in the previous pingplotter lab by starting wireshark, doing something else in another command prompt or window and then stopping wireshark to look at the details. This one involved clearing the cache, visiting a site, adjusting the filters in wireshark, and then observe what was sent back and forth. What I found interesting was the DNS messages sent to and from my machine across the network as well as the DNS protoccol information on wireshark when you run nslookup while capturing in wireshark.
+<p>
+	In the HTTP lab, I had some trouble in finding the information requested from the  questions. I was able to filter what I was supposed to be looking at, but I did not always find what the questions were asking for. For example, I could not always find the right GET message in wireshark after oopening the page, but that could've been caused by some setting that I accidentally touched in a previous lab and forgot to change it back. I was able to find most of what the lab asked when going through the steps and questions. It was interesting to see the many messages that are getting sent back and forth when making a simple web request. This lab was also in line with my current job because it works with status codes of requests, like in my job, if we see a 404 response code, then we need to look at the root issue to see what caused it and fix the problem.
+<p>
+	The TCP lab is one I found very interesting because it required me to upload a file and then see the data passed back and forth with wireshark. What I found most interesting was the amount of TCP and HTTP messages I was able to look through after making the TCP connection. I did have some trouble in looking at the TCP graph. When I first looked at it, it was not showing up very well and I was very confused and tried uploading and capturing the packets again in wireshark. Unfortunately, I was not able to get the desired result that the lab wanted me to get so I just read into more detail of what the lab wanted me to see. I found this lab very similar to the HTTP lab but this time focusing on TCP. I do not work with TCP connections in my work so I had a little trouble in understanding the types of messages that were being sent back and forth.
+<p>
+	This UDP lab didn't seem to interest me that much as it was very short and it didn't require many steps for me to get a good grasp on really what UDP protoccol is. To really gain a better understanding of UDP I had t o do extra research and I learned it is an alternative to TCP where it is mainly used for low-latency and loss-toleratin connections. This lab was mainly just looking through wireshark with UDP in the filter and analyzing the data it gave back.
+<p>
+	I seemed to really enjoy the SSL lab because it is very in line with my current position at Macys.com. As part of a large e-commerce cite, I need to manage and observe the many orders that happen across the world. The SSL lab made this more interesting because important information is being transferred across networks and need to be securly encrypted. To be honest, I did not do all of the questions mentioned in the lab but I did read through them and tried to understand what they asking and what point they were trying to get across. I did recognize some topics from this lab like session ID and encrypted handshake. I see these terms a lot in my line of work so it was very cool to see it in wireshark and in a controlled setting. I also found it interesting to see the server/client connection in a real world setting, like an e-commerce site where we can use wireshark to see more details than the average person.
+<p>
+	These labs were all interesting in their own way, but I feel like the SSL and the DNS lab were the most interesting to me because it related to my current line of work. Being familiar with those commands and terms made it a lot easier to complete the lab and answer the questions. In particular, I use nslookup a lot during my job so it was cool to see new flags I can run with the command to get more specific information. Overall, I think that wireshark is a powerful tool to peer into the many connections and messages that are being sent back and forth networks when doing the most simplest tasks on web servers.
 
 </body></html>
