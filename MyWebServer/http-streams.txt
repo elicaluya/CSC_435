@@ -1,0 +1,76 @@
+OUTPUT FROM MyListener:
+- This is the result of entering http://localhost:2540/dog.txt and http://localhost:2540/cat.html into the firefox browser.
+- The listener program was able to capture the GET request from the browser for dog.txt and cat.html on my local machine
+
+GET /dog.txt HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+
+GET /cat.html HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+
+
+OUTPUT FROM MyTelnetClient:
+- This shows the output of using the Telnet client to try and get the dog.txt and cat.html file from the condor.depaul.edu webserver
+- For some reason, I am getting a 301 response code from the server saying that the file has been permamnently moved
+- I can still see the MIME header and Content-Length so I can get useful information even though I get a 301 response code.
+
+Using server: condor.depaul.edu, Port: 80
+Enter text to send to the server, <stop> to end: GET /elliott/dog.txt HTTP/1.1
+Enter text to send to the server, <stop> to end: Host: condor.depaul.edu:80
+Enter text to send to the server, <stop> to end:
+Enter text to send to the server, <stop> to end: stop
+HTTP/1.1 301 Moved Permanently
+Date: Mon, 07 Oct 2019 18:57:32 GMT
+Server: Apache
+Location: https://condor.depaul.edu/elliott/dog.txt
+Content-Length: 249
+Content-Type: text/html; charset=iso-8859-1
+Connection: Keep-Alive
+Age: 0
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://condor.depaul.edu/elliott/dog.txt">here</a>.</p>
+</body></html>
+
+
+
+Using server: condor.depaul.edu, Port: 80
+Enter text to send to the server, <stop> to end: GET /elliott/cat.html HTTP/1.1
+Enter text to send to the server, <stop> to end: Host: condor.depaul.edu:80
+Enter text to send to the server, <stop> to end:
+Enter text to send to the server, <stop> to end:
+Enter text to send to the server, <stop> to end: stop
+HTTP/1.1 301 Moved Permanently
+Date: Mon, 07 Oct 2019 18:55:25 GMT
+Server: Apache
+Location: https://condor.depaul.edu/elliott/cat.html
+Content-Length: 250
+Content-Type: text/html; charset=iso-8859-1
+Connection: Keep-Alive
+Age: 0
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://condor.depaul.edu/elliott/cat.html">here</a>.</p>
+</body></html>
