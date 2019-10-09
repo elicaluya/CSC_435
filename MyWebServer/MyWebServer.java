@@ -7,6 +7,7 @@ This is VERY quick and dirty code that leaves workers lying around. But you get 
 
 import java.io.*;  // Get the Input Output libraries
 import java.net.*; // Get the Java networking libraries
+import java.util.*;
 
 class WebServerWorker extends Thread {    // Class definition
     Socket sock;                   // Class member, socket, local to ListnWorker.
@@ -20,11 +21,13 @@ class WebServerWorker extends Thread {    // Class definition
             out = new PrintStream(sock.getOutputStream());
             in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
+            
             String request;
 
-            request = in.readLine ();
-            
-            sendResponse(out,sock,request);
+            if ((request = in.readLine()) != null){
+                determineRequest(out,sock,request);
+            }
+
             
             sock.close(); // close this connection, but not the server;
             
@@ -33,20 +36,39 @@ class WebServerWorker extends Thread {    // Class definition
         }
     }
 
-
-    public void sendResponse(PrintStream out, Socket sock, String request) throws IOException{
+    public void determineRequest(PrintStream out, Socket sock, String request){
         String fileName = "";
-        String mimeType = "";
 
-        // Indexes to extract the file name substring from the request
-        int frontIndex = request.indexOf("/");
-        int endIndex = request.indexOf(" ", frontIndex);
-        
-        // If it is a favicon.ico request, ignore it because we only need the file name
-        if (!request.substring(frontIndex+1, endIndex).equals("favicon.ico")){
+        if (!request.contains("/favicon.ico HTTP")){
+            // Indexes to extract the file name substring from the request
+            int frontIndex = request.indexOf("/");
+            int endIndex = request.indexOf(" ", frontIndex);
+
             fileName = request.substring(frontIndex+1, endIndex);
             System.out.println("File name: " + fileName);
-        
+
+            if (fileName.equals(" ") || fileName.substring(fileName.length()-1).equals("/"))
+                displayDirectory(out,sock,fileName);
+            else
+                sendResponse(out,sock,fileName);
+        }
+    }
+
+
+    // Send response back to client if requested a txt or html file
+    public void sendResponse(PrintStream out, Socket sock, String request) throws IOException{
+        String fileName = "";
+        String directoryName = "";
+        String mimeType = "";
+
+        if (!request.contains("/favicon.ico HTTP")){
+            // Indexes to extract the file name substring from the request
+            int frontIndex = request.indexOf("/");
+            int endIndex = request.indexOf(" ", frontIndex);
+
+            fileName = request.substring(frontIndex+1, endIndex);
+            System.out.println("File name: " + fileName);
+
 
             // Set the correct MIME type depending on what type of file the user is requesting
             if (fileName.substring(fileName.length()-4).equals("html"))
@@ -84,12 +106,41 @@ class WebServerWorker extends Thread {    // Class definition
                 System.out.println("Contents of File: \n" + fileContents.toString());
                 System.out.flush();
             }
-            
+        }
+    }
+
+
+    // Method for displaying the directory requested
+    public void displayDirectory(PrintStream out, Socket sock, String directory){
+        String directoryName = "";
+
+        // Indexes to extract the file name substring from the request
+        int frontIndex = request.indexOf("/");
+        int endIndex = request.indexOf(" ", frontIndex);
+
+        // If it is a favicon.ico request, ignore it because we only need the directory name
+        if (!request.substring(frontIndex+1, endIndex).equals("favicon.ico")){
+            directoryName = request.substring(frontIndex, endIndex);
         }
 
-        
+        if (directoryName.equals("/"))
+            directoryName = "./";
+
+        File dir = new File(directoryName);
+
+        // Get all the files and directory under your diretcory
+        File[] strFilesDirs = dir.listFiles();
+
+        for ( int i = 0; i < strFilesDirs.length; i++ ) {
+            if ( strFilesDirs[i].isDirectory ( ) ) 
+                System.out.println ( "Directory: " + strFilesDirs[i] ) ;
+            else if ( strFilesDirs[i].isFile ( ) )
+                System.out.println ( "File: " + strFilesDirs[i] + " (" + strFilesDirs[i].length ( ) + ")" ) ;
+        }
     }
 }
+
+
 
 public class MyWebServer {
 
@@ -102,7 +153,7 @@ public class MyWebServer {
 
     ServerSocket servsock = new ServerSocket(port, q_len);
 
-    System.out.println("Clark Elliott's Port listener running at 2540.\n");
+    System.out.println("Elijah Caluya's Web Server running at 2540.\n");
     while (controlSwitch) {
       // wait for the next client connection:
       sock = servsock.accept();
