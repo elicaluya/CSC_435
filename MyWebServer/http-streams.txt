@@ -1,6 +1,8 @@
 OUTPUT FROM MyListener:
 - This is the result of entering http://localhost:2540/dog.txt and http://localhost:2540/cat.html into the firefox browser.
-- The listener program was able to capture the GET request from the browser for dog.txt and cat.html on my local machine
+- The listener program was able to capture the GET request from the browser for dog.txt and cat.html on my local machine.
+- In MyWebServer, the server gets this request from the firefrox browser and parses the request to try and find the file the user is requesting.
+- The web server will return the file if it exists or give a 404 NOT FOUND response code if the file is not on the web server.
 
 GET /dog.txt HTTP/1.1
 Host: localhost:2540
@@ -22,11 +24,16 @@ Connection: keep-alive
 Upgrade-Insecure-Requests: 1
 
 
+****************************************************************************************************************************************************
+
 
 OUTPUT FROM MyTelnetClient:
 - This shows the output of using the Telnet client to try and get the dog.txt and cat.html file from the condor.depaul.edu webserver
 - For some reason, I am getting a 301 response code from the server saying that the file has been permamnently moved
 - I can still see the MIME header and Content-Length so I can get useful information even though I get a 301 response code.
+- In MyWebServer, We want to replicate this response code for requests but with the 200 OK response code instead of 301.
+- The main things to take note of are the response code, content length, and the MIME type.
+- All of the above components make it so we are able to send information back to the client after a request is made.
 
 Using server: condor.depaul.edu, Port: 80
 Enter text to send to the server, <stop> to end: GET /elliott/dog.txt HTTP/1.1

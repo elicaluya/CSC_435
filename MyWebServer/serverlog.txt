@@ -1,0 +1,158 @@
+Below is the annotated ooutput from MyWebServer as well as the requests made to get these outputs:
+
+
+CLIENT ENTERS:
+http://localhost:2540/
+
+MyWebServer OUTPUT:
+*HTML page of list of files in the current directory*
+
+GET / HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://localhost:2540/test_dir/
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Cache-Control: max-age=0
+
+Opening directory: .
+
+
+
+CLIENT CLICKS ON dog.txt HOT LINK:
+http://localhost:2540/dog.txt
+
+MyWebServer OUTPUT:
+*dog.txt contents displayed in web browser*
+
+GET /dog.txt HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/
+Upgrade-Insecure-Requests: 1
+
+Opening file: dog.txt
+
+
+
+CLIENT REQUESTS cat.html BY ENTERING BELOW TEXT IN BROWSER:
+http://localhost:2540/cat.html
+
+MyWebServer OUTPUT:
+*cat.html displayed in web browser*
+
+GET /cat.html HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/
+Upgrade-Insecure-Requests: 1
+
+Opening file: cat.html
+
+
+
+CLIENT CLICKS ON test_dir HOT LINK:
+http://localhost:2540/test_dir/
+
+MyWebServer OUTPUT:
+*Contents of test_dir displayed in HTML page*
+
+GET /test_dir/ HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/
+Upgrade-Insecure-Requests: 1
+
+Opening directory: test_dir
+
+
+
+CLIENT REQUESTS test_dir/inner_test_dir/inner_test.txt BY ENTERING BELOW TEXT IN BROWSER:
+http://localhost:2540/test_dir/inner_test_dir/inner_test.txt
+
+MyWebServer OUTPUT:
+*inner_test.txt contents are displayed on HTML page*
+
+GET /test_dir/inner_test_dir/inner_test.txt HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/test_dir/inner_test_dir/
+Upgrade-Insecure-Requests: 1
+
+Opening file: test_dir/inner_test_dir/inner_test.txt
+
+
+
+CLIENT CLICKS ON PARENT DIRECTORY HOT LINK IN test_dir/inner_test_dir/:
+http://localhost:2540/test_dir/
+
+MyWebServer OUTPUT:
+*Contents of parent directory of test_dir/inner_test_dir/ is displayed*
+
+GET /test_dir/ HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/test_dir/inner_test_dir/
+Upgrade-Insecure-Requests: 1
+
+Opening directory: test_dir
+
+
+
+CLIENT USES FORM METHOD IN addnums.html:
+http://localhost:2540/cgi/addnums.fake-cgi?person=TestForLog&num1=10&num2=512
+
+MyWebServer OUTPUT:
+*Formatted HTML page with evaluated data is displayed*
+
+GET /cgi/addnums.fake-cgi?person=TestForLog&num1=10&num2=512 HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://localhost:2540/addnums.html
+Upgrade-Insecure-Requests: 1
+
+
+
+CLIENT ENTERS AN INVALID REQUEST:
+http://localhost:2540/invalidRequest
+
+MyWebServer OUTPUT:
+*404 NOT FOUND page is displayed*
+
+GET /invalidRequest HTTP/1.1
+Host: localhost:2540
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+Could not find invalidRequest in Web Server!

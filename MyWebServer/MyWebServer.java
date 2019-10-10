@@ -19,6 +19,8 @@ e.g.:
 
 > java MyWebServer
 
+Open up Firefox web browser and make web requests on http://localhost:2540/
+
 
 5. List of files needed for running the program.
 
@@ -30,13 +32,18 @@ e.g.:
 5. Notes:
 
 e.g.:
-
+Start the MyWebServer program first then make requests to the Web Server in a seperated Firefox browser on http://localhost:2540/.
+Requests to specific files on the web server will return the opened file and requests for a directory will display the conents of the 
+directory in the HTML page. The Web Server will also interpret GET requests for FORM method on addnums.html file. There is specific
+code to interpret the .fake-cgi request in the addnums.html file and return a formatted HTML page with the data entered.
+The Web Server will also respond with 404 Response code if the user is requesting a file that does not exists on the web server or
+if the file requested is not a directory, .txt, or .html file.
 
 ----------------------------------------------------------*/
 
 import java.io.*;  // Get the Input Output libraries
 import java.net.*; // Get the Java networking libraries
-import java.util.*;
+import java.util.*; // For array of File objects
 
 class WebServerWorker extends Thread {    // Class definition
     Socket sock;                   // Class member, socket, local to ListnWorker.
@@ -103,6 +110,8 @@ class WebServerWorker extends Thread {    // Class definition
         }
     }
 
+
+
     /******************************************************************************************************************************************************************/
     //                                         Method used to get the filename/directory name from the HTTP GET request
     /******************************************************************************************************************************************************************/
@@ -117,6 +126,7 @@ class WebServerWorker extends Thread {    // Class definition
 
         return fileName;
     }
+
 
 
     /******************************************************************************************************************************************************************/
@@ -134,8 +144,7 @@ class WebServerWorker extends Thread {    // Class definition
         else if (fileName.substring(fileName.length()-4).equals(".txt"))
             mimeType = "text/plain";    // If text file set MIME type to text/plain
             
-        System.out.println("Opening file: " + fileName + "\n");
-
+        System.out.println("Opening file: " + fileName + "\n"); // Print on console what file is being opened
 
 
         // Create File variable to open the file by file name
@@ -173,6 +182,7 @@ class WebServerWorker extends Thread {    // Class definition
     }
 
 
+
     /******************************************************************************************************************************************************************/
     //                             Send back to client an HTML directory with hot links of the current files and directories they requested
     /******************************************************************************************************************************************************************/
@@ -206,8 +216,7 @@ class WebServerWorker extends Thread {    // Class definition
                 parentDir = "..";   // Otherwise just go to parent directory
 
             // Put in HTML hot link to go to parent directory
-            dirContents.append("<a style = font-weight:bold href ="+parentDir+"/><---PARENT DIRECTORY</a><br>\n");
-
+            dirContents.append("<a style = font-weight:bold href =" + parentDir + "/><---PARENT DIRECTORY</a><br>\n");
 
 
             // Get all the files and directory under diretcory opened
@@ -233,8 +242,9 @@ class WebServerWorker extends Thread {    // Class definition
     }
 
 
+
     /******************************************************************************************************************************************************************/
-    //                                  Method to handle the FORM 
+    //                                          Method to handle the FORM method in addnums.html
     /******************************************************************************************************************************************************************/
     public void addNums(PrintStream out, String request) throws IOException{
         // Get all the info from FORM after .fake-cgi to parse string
@@ -248,14 +258,32 @@ class WebServerWorker extends Thread {    // Class definition
         // Get the second number from FORM
         String num2 = formEntry.substring(formEntry.indexOf("&num2=")+6,formEntry.length());
 
-        // Get the sum of the numbers entered
-        int sum = Integer.parseInt(num1) + Integer.parseInt(num2);
+        int sum = 0;
+        Boolean validEntry = true;
+        // Check to see if the user entered valid numbers to add up
+        try {
+            // Get the sum of the numbers entered
+            sum = Integer.parseInt(num1) + Integer.parseInt(num2);
+        }
+        catch (Exception e){
+            validEntry = false; // Make value false if the user did not enter numbers in any of the boxes
+        }
 
-        // Create string with the entered name, numbers, and the sum of those numbers for the HTML page to be returned
-        String addNumString = "<a style = font-weight:bold href = /addnums.html><---Back to addnums.html</a><br>\n" +
-                                "<h1>Add Nums Result:</h1>\n <p>Dear " + name 
-                                + " the sum of " + num1 + " and " + num2
-                                + " is " + Integer.toString(sum) + "</p>";
+        String addNumString = "";   // Store string to send back to client in header
+
+        if (validEntry){
+            // Create string with the entered name, numbers, and the sum of those numbers for the HTML page to be returned
+            addNumString = "<a style = font-weight:bold href = /addnums.html><---Back to addnums.html</a><br>\n" +
+                            "<h1>Add Nums Result:</h1>\n <p>Dear " + name + ", the sum of " + num1 + " and " + num2
+                            + " is " + Integer.toString(sum) + "</p>";
+        }
+        else {
+            // Create string for response header saying that the user entered invalid numbers if they input an invalid entry
+            addNumString = "<a style = font-weight:bold href = /addnums.html><---Back to addnums.html</a><br>\n" +
+                            "<h1>Add Nums Result:</h1>\n <p>Dear " + name + ", please enter valid numbers in the entry boxes.</p>";
+        }
+            
+                                
         // Send back to client with proper header response with the evaluated HTML string 
         out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (addNumString+1) + "\r\n" 
                         + "Content-Type: text/html\r\n" + "\r\n\r\n" + addNumString);
@@ -273,7 +301,10 @@ class WebServerWorker extends Thread {    // Class definition
         // Send back proper 404 NOT FOUND header response back to the client
         out.println("HTTP/1.1 404 NOT FOUND\r\n" + "Content-Length: " + (notFound.length()+2) + "\r\n" 
                         + "Content-Type: text/html\r\n" + "\r\n\r\n" + notFound);
-        out.flush(); 
+        out.flush();
+
+        System.out.println("Could not find " + file + " in Web Server!");
+        System.out.flush(); 
     }
 }
 
