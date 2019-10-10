@@ -17,14 +17,14 @@ e.g.:
 
 e.g.:
 
-
+> java MyWebServer
 
 
 5. List of files needed for running the program.
 
 e.g.:
 
-
+1) MyWebServer.java
 
 
 5. Notes:
@@ -46,41 +46,52 @@ class WebServerWorker extends Thread {    // Class definition
         // Get I/O streams from the socket:
         PrintStream out = null;
         BufferedReader in = null;
-        String getRequest = "";
+        String getRequest = "";     // String to hold the file/directory after GET and before HTTP/1.1
         try {
             out = new PrintStream(sock.getOutputStream());
             in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-            
+            // Read in from the input stream request from client
             String request;
-
             request = in.readLine();
             
 
-            if (request != null){
-                if (!request.contains("favicon.ico")){
-                    System.out.println(request);
+            if (request != null){       // Read in all request lines
+                if (!request.contains("favicon.ico")){  // Ignore favicon.ico GET request
+                    System.out.println(request);    // Print out tonly the first GET request with file/directory name
 
-                    getRequest = parseRequest(request);
+                    getRequest = parseRequest(request);   // Store the desired file/directory name
                 
-                
+                    // Keep reading in while the BufferedReader is still ready to be read
+                    // Referenced from: https://www.tutorialspoint.com/java/io/bufferedreader_ready.htm
                     while (in.ready()){
                         request = in.readLine();
-                        System.out.println(request);
+                        System.out.println(request);    // Print out the Entire request from the client
                     }
 
-
+                    // If the request is to not see current directory
                     if (!(getRequest.length() == 0)){
+                        // If trailing "/" then user reqested a directory
                         if (getRequest.substring(getRequest.length()-1).equals("/"))
-                            dirResponse(out,sock,getRequest);
+                            dirResponse(out,getRequest);    // Send directory response
+
+                        // If .html or .txt then the user is requesting for a file
                         else if (getRequest.contains(".html") || getRequest.contains(".txt"))
-                            fileResponse(out,sock,getRequest);
+                            fileResponse(out,getRequest);   // Send file response
+
+                        // If the response is coming from FORM method
+                        else if (getRequest.contains(".fake-cgi?"))
+                            addNums(out,getRequest);    // Send response for FORM method
+
+                        // If the request is invalid (i.e. invalid file type, invalid request, or file not in server)
+                        // Send back to client a 404 NOT FOUND header response
                         else 
-                            notFoundResponse(out,getRequest);
+                            notFoundResponse(out,getRequest);   // Send 404 response code
                         
                     }
+                    // If the request is to see the current directory MyWebServer is started in
                     else
-                        dirResponse(out,sock,getRequest);
+                        dirResponse(out,getRequest);
                 }
             }
             
@@ -101,6 +112,7 @@ class WebServerWorker extends Thread {    // Class definition
         // Indexes to extract the file name substring from the request
         int frontIndex = request.indexOf("/");
         int endIndex = request.indexOf(" ", frontIndex);
+        // Parse file/directory name  in between GET and HTTP/1.1 request string
         fileName = request.substring(frontIndex+1,endIndex);
 
         return fileName;
@@ -110,7 +122,7 @@ class WebServerWorker extends Thread {    // Class definition
     /******************************************************************************************************************************************************************/
     //                                         Send back to client the opened file that they requested
     /******************************************************************************************************************************************************************/
-    public void fileResponse(PrintStream out, Socket sock, String request) throws IOException{
+    public void fileResponse(PrintStream out, String request) throws IOException{
         String fileName = "";   // String variable to store the file to open
         String mimeType = "";   // String variable to store the MIME type depending on what type of file is being opened
 
@@ -156,7 +168,7 @@ class WebServerWorker extends Thread {    // Class definition
             out.flush();
         }
         else
-            notFoundResponse(out,fileName);
+            notFoundResponse(out,fileName);     // The file does not exist on the web server so send 404 response code
 
     }
 
@@ -164,7 +176,7 @@ class WebServerWorker extends Thread {    // Class definition
     /******************************************************************************************************************************************************************/
     //                             Send back to client an HTML directory with hot links of the current files and directories they requested
     /******************************************************************************************************************************************************************/
-    public void dirResponse(PrintStream out, Socket sock, String directory) throws IOException{
+    public void dirResponse(PrintStream out, String directory) throws IOException{
         String directoryName = "";  // String variable to store the directory we want to open
         String parentDir = "";      // String variable to store the parent directory
 
@@ -181,8 +193,8 @@ class WebServerWorker extends Thread {    // Class definition
 
         File dir = new File(directoryName);     // Open the directory to read through
         
+        // Checking if the directory is in the web server
         if (dir.exists()){
-
             System.out.println("Opening directory: " + dir.getPath() + "\n");      // Print out which directory we are opening
             dirContents.append("<pre> \n <h1>Index of " + dir.getPath() + "</h1>\n");   // Display current directory in HTML form
 
@@ -217,7 +229,37 @@ class WebServerWorker extends Thread {    // Class definition
             out.flush();
         }
         else
-            notFoundResponse(out,directoryName);
+            notFoundResponse(out,directoryName);    // The directory does not exist on web server so send 404 response code
+    }
+
+
+    /******************************************************************************************************************************************************************/
+    //                                  Method to handle the FORM 
+    /******************************************************************************************************************************************************************/
+    public void addNums(PrintStream out, String request) throws IOException{
+        // Get all the info from FORM after .fake-cgi to parse string
+        int formIndex = request.indexOf("?");
+        String formEntry = request.substring(formIndex);
+        
+        // Get the name from FORM. Start with index 8 because first 8 characters are "?person="
+        String name = formEntry.substring(8,formEntry.indexOf("&num1="));
+        // Get the first number from FORM
+        String num1 = formEntry.substring(formEntry.indexOf("&num1=")+6,formEntry.indexOf("&num2="));
+        // Get the second number from FORM
+        String num2 = formEntry.substring(formEntry.indexOf("&num2=")+6,formEntry.length());
+
+        // Get the sum of the numbers entered
+        int sum = Integer.parseInt(num1) + Integer.parseInt(num2);
+
+        // Create string with the entered name, numbers, and the sum of those numbers for the HTML page to be returned
+        String addNumString = "<a style = font-weight:bold href = /addnums.html><---Back to addnums.html</a><br>\n" +
+                                "<h1>Add Nums Result:</h1>\n <p>Dear " + name 
+                                + " the sum of " + num1 + " and " + num2
+                                + " is " + Integer.toString(sum) + "</p>";
+        // Send back to client with proper header response with the evaluated HTML string 
+        out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (addNumString+1) + "\r\n" 
+                        + "Content-Type: text/html\r\n" + "\r\n\r\n" + addNumString);
+        out.flush();
     }
 
 
@@ -228,6 +270,7 @@ class WebServerWorker extends Thread {    // Class definition
         // Create HTML page to display to user saying that the requested file could not be found on the server
         String notFound = "<h1>404 Not Found</h1>\n" + "<a style = font-weight:bold href =./><---HOME DIRECTORY</a><br>\n"
                             + file + " was not found on the web server!";
+        // Send back proper 404 NOT FOUND header response back to the client
         out.println("HTTP/1.1 404 NOT FOUND\r\n" + "Content-Length: " + (notFound.length()+2) + "\r\n" 
                         + "Content-Type: text/html\r\n" + "\r\n\r\n" + notFound);
         out.flush(); 
