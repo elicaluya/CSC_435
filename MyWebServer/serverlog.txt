@@ -9,16 +9,9 @@ MyWebServer OUTPUT:
 
 GET / HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Referer: http://localhost:2540/test_dir/
-Connection: keep-alive
-Upgrade-Insecure-Requests: 1
-Cache-Control: max-age=0
 
 Opening directory: .
+
 
 
 
@@ -30,15 +23,9 @@ MyWebServer OUTPUT:
 
 GET /dog.txt HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/
-Upgrade-Insecure-Requests: 1
 
 Opening file: dog.txt
+
 
 
 
@@ -50,15 +37,9 @@ MyWebServer OUTPUT:
 
 GET /cat.html HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/
-Upgrade-Insecure-Requests: 1
 
 Opening file: cat.html
+
 
 
 
@@ -70,15 +51,9 @@ MyWebServer OUTPUT:
 
 GET /test_dir/ HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/
-Upgrade-Insecure-Requests: 1
 
 Opening directory: test_dir
+
 
 
 
@@ -90,15 +65,9 @@ MyWebServer OUTPUT:
 
 GET /test_dir/inner_test_dir/inner_test.txt HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/test_dir/inner_test_dir/
-Upgrade-Insecure-Requests: 1
 
 Opening file: test_dir/inner_test_dir/inner_test.txt
+
 
 
 
@@ -110,15 +79,9 @@ MyWebServer OUTPUT:
 
 GET /test_dir/ HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/test_dir/inner_test_dir/
-Upgrade-Insecure-Requests: 1
 
 Opening directory: test_dir
+
 
 
 
@@ -130,13 +93,7 @@ MyWebServer OUTPUT:
 
 GET /cgi/addnums.fake-cgi?person=TestForLog&num1=10&num2=512 HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Referer: http://localhost:2540/addnums.html
-Upgrade-Insecure-Requests: 1
+
 
 
 
@@ -148,11 +105,5 @@ MyWebServer OUTPUT:
 
 GET /invalidRequest HTTP/1.1
 Host: localhost:2540
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Upgrade-Insecure-Requests: 1
 
 Could not find invalidRequest in Web Server!

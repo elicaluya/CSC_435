@@ -154,10 +154,8 @@ class WebServerWorker extends Thread {    // Class definition
         BufferedReader readFile = null;
         String line = "";
 
-        // String builder variable so we can store all of the lines in the opened file
-        // We have to send a long string back to the client so StringBuilder was the easiest way for me to get all contents of the file into one string
-        // Knowledge and methods for StringBuilder referenced from: https://www.javatpoint.com/StringBuilder-class
-        StringBuilder fileContents = new StringBuilder();
+        // Use this String variable to store the contents of the file By continously adding onto the string after each line read.
+        String fileContents = "";
 
 
         // All knowledge and methods for Files referenced from Prof. Elliott's examples and https://www.geeksforgeeks.org/file-class-in-java/
@@ -168,12 +166,12 @@ class WebServerWorker extends Thread {    // Class definition
           
             // Append all of the contents in the file to a String Builder Object
             while ((line = readFile.readLine()) != null)
-                fileContents.append(line+"\n");
+                fileContents+=line + "\n";
                 
 
             // Write back to client the proper header response with content length, content type, and contents of the file            
-            out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (fileContents.toString().getBytes().length+1) + "\r\n" 
-                            + "Content-Type: " + mimeType + "\r\n" + "\r\n\r\n" + fileContents.toString());
+            out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (fileContents.length()+1) + "\r\n" 
+                            + "Content-Type: " + mimeType + "\r\n" + "\r\n\r\n" + fileContents);
             out.flush();
         }
         else
@@ -190,8 +188,8 @@ class WebServerWorker extends Thread {    // Class definition
         String directoryName = "";  // String variable to store the directory we want to open
         String parentDir = "";      // String variable to store the parent directory
 
-        // Use string builder to get the long HTTP response back to client because it will be the whole contents of the directory
-        StringBuilder dirContents = new StringBuilder();    
+        // Create String variable to store all the contents of te opened file.
+        String dirContents = "";    
 
 
         // Checking if the request is for the current directory because the request sent for current directory is empty string
@@ -206,7 +204,7 @@ class WebServerWorker extends Thread {    // Class definition
         // Checking if the directory is in the web server
         if (dir.exists()){
             System.out.println("Opening directory: " + dir.getPath() + "\n");      // Print out which directory we are opening
-            dirContents.append("<pre> \n <h1>Index of " + dir.getPath() + "</h1>\n");   // Display current directory in HTML form
+            dirContents += "<pre> \n <h1>Index of " + dir.getPath() + "</h1>\n";   // Display current directory in HTML form
 
         
             // If we are in current directory we do not want access to our inner files so calls to parent directory will just go to current directory
@@ -216,7 +214,7 @@ class WebServerWorker extends Thread {    // Class definition
                 parentDir = "..";   // Otherwise just go to parent directory
 
             // Put in HTML hot link to go to parent directory
-            dirContents.append("<a style = font-weight:bold href =" + parentDir + "/><---PARENT DIRECTORY</a><br>\n");
+            dirContents += "<a style = font-weight:bold href =" + parentDir + "/><---PARENT DIRECTORY</a><br>\n";
 
 
             // Get all the files and directory under diretcory opened
@@ -224,23 +222,39 @@ class WebServerWorker extends Thread {    // Class definition
             // Loop through contents of directory and create hot links for each one and specifying what type of file it is
             for ( int i = 0; i < strFilesDirs.length; i++ ) {
                 if (strFilesDirs[i].isDirectory()){
-                    dirContents.append("<a href="+strFilesDirs[i].getName()+"/>Dir: "+strFilesDirs[i].getName()+"/</a><br>\n");
+                    dirContents += "<a href="+strFilesDirs[i].getName()+"/>Dir: "+strFilesDirs[i].getName()+"/</a><br>\n";
                 }   
                 else if (strFilesDirs[i].isFile()){
-                    dirContents.append("<a href="+strFilesDirs[i].getName()+">File: "+strFilesDirs[i].getName()+"</a><br>\n");
+                    dirContents += "<a href="+strFilesDirs[i].getName()+">File: "+strFilesDirs[i].getName()+"</a><br>\n";
                 }
             }
 
 
             // Write back to client the proper header response with content length, content type, and contents of the file            
-            out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (dirContents.toString().getBytes().length+1) + "\r\n" 
-                            + "Content-Type: text/html\r\n" + "\r\n\r\n" + dirContents.toString());
+            out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (dirContents.length()+1) + "\r\n" 
+                            + "Content-Type: text/html\r\n" + "\r\n\r\n" + dirContents);
             out.flush();
         }
         else
             notFoundResponse(out,directoryName);    // The directory does not exist on web server so send 404 response code
     }
 
+
+    /******************************************************************************************************************************************************************/
+    //                             Respond back to client with a 404 HTTP response saying that the requested file/directory is not on the web server
+    /******************************************************************************************************************************************************************/
+    public void notFoundResponse(PrintStream out, String file){
+        // Create HTML page to display to user saying that the requested file could not be found on the server
+        String notFound = "<h1>404 Not Found</h1>\n" + "<a style = font-weight:bold href =./><---HOME DIRECTORY</a><br>\n"
+                            + file + " was not found on the web server!";
+        // Send back proper 404 NOT FOUND header response back to the client
+        out.println("HTTP/1.1 404 NOT FOUND\r\n" + "Content-Length: " + (notFound.length()+2) + "\r\n" 
+                        + "Content-Type: text/html\r\n" + "\r\n\r\n" + notFound);
+        out.flush();
+
+        System.out.println("Could not find " + file + " in Web Server!");
+        System.out.flush(); 
+    }
 
 
     /******************************************************************************************************************************************************************/
@@ -285,26 +299,9 @@ class WebServerWorker extends Thread {    // Class definition
             
                                 
         // Send back to client with proper header response with the evaluated HTML string 
-        out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (addNumString+1) + "\r\n" 
+        out.println("HTTP/1.1 200 OK\r\n" + "Content-Length: " + (addNumString.length()+1) + "\r\n" 
                         + "Content-Type: text/html\r\n" + "\r\n\r\n" + addNumString);
         out.flush();
-    }
-
-
-    /******************************************************************************************************************************************************************/
-    //                             Respond back to client with a 404 HTTP response saying that the requested file/directory is not on the web server
-    /******************************************************************************************************************************************************************/
-    public void notFoundResponse(PrintStream out, String file){
-        // Create HTML page to display to user saying that the requested file could not be found on the server
-        String notFound = "<h1>404 Not Found</h1>\n" + "<a style = font-weight:bold href =./><---HOME DIRECTORY</a><br>\n"
-                            + file + " was not found on the web server!";
-        // Send back proper 404 NOT FOUND header response back to the client
-        out.println("HTTP/1.1 404 NOT FOUND\r\n" + "Content-Length: " + (notFound.length()+2) + "\r\n" 
-                        + "Content-Type: text/html\r\n" + "\r\n\r\n" + notFound);
-        out.flush();
-
-        System.out.println("Could not find " + file + " in Web Server!");
-        System.out.flush(); 
     }
 }
 
