@@ -133,18 +133,56 @@ public class Blockchain {
 
 
 /******************************************************************************************************************************************************************/
-	// Referenced from Prof. Elliott's starter files bc.java and BlockInputE.java
+	// Referenced from Prof. Elliott's starter files bc.java, WorkB, and BlockInputE.java
 	// Function to start the whole system
 	public static void startSystem(HashMap<Integer,PublicKey> procPubKey, CountDownLatch latch){
+		Socket sock;
+		ObjectOutputStream out = null;
+
 		try {
 			String file = "BlockInput" + Integer.toString(PID) + ".txt";
 
 			if (PID == 2){
-				BlockRecord fakeBlock = new BlockRecord();	// Start with new fake block
+				BlockRecord dummyBlock = new BlockRecord();	// Start with new dummy block
 				String id = new String(UUID.randomUUID().toString());	// Create UUID for process
-				fakeBlock.setABlockID(id);
+				dummyBlock.setABlockID(id);
 
+				String marshalledBlock = marshalToXML(dummyBlock);	// Marshal the block data to XML
+				MessageDigest md = MessageDigest.getInstance("SHA-256");
+				md.update(marshalledBlock.getBytes());
+				byte[] byteHash = md.digest();
+				String hashString = Base64.getEncoder().encodeToString(byteHash);	// Encode to SHA256 string with Base64 encoding
+				dummyBlock.setASHA256String(hashString);
+				dummyBlock.setBlockNum(1);
+				BlockChain.add(dummyBlock);
+
+				for (int i = 0; i < totalNumProcesses; i++) {
+					// Create output stream to send the marshalled objects
+					sock = new Socket("localhost", BlockchainServerPortBase + i);
+					out = new ObjectOutputStream(sock.getOutputStream());
+					
+					// Set up Block Record Group for the BlockChain
+					BlockRecordGroup brg = new BlockRecordGroup();
+					brg.setBlockRecordGroup(BlockChain);
+
+					// Marshal the group so we can send it to each server
+					JAXBContext jaxbContext = JAXBContext.newInstance(BlockRecordGroup.class);
+					Marshaller marshaller = jaxbContext.createMarshaller();
+					StringWriter writer = new StringWriter();
+					marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,true);
+					marshaller.marshal(brg,writer);
+					String xmlString = writer.toString();
+					out.writeObject(xmlString);
+				}
+				out.flush();
+				out.close();
 			}
+			sendPubKey();	// Send out Public key to all processes
+
+			// CountDownLatch await() method referenced from https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/CountDownLatch.html 
+			latch.await();	// Make current thread to wait until the latch is counted down to zero
+			
+			
 		}
 		catch (Exception e) {e.printStackTrace();}
 	}
@@ -171,7 +209,81 @@ public class Blockchain {
 	}
 
 
-	
+/******************************************************************************************************************************************************************/
+	// Referenced from Prof. Elliott's starter files BlockInputE.java and BlockI.java
+	// Method for sending public key of the current process to all of the processes.
+
+	public static void sendPubKey(){
+		Socket sock;
+		ObjectOutputStream out;
+
+		try {
+			for (int i = 0; i < totalNumProcesses; i++){
+				sock = new Socket("localhost",KeyServerPortBase+i);	// Create new connection for each process
+				PublicKeyBlockRecord pkbr = new PublicKeyBlockRecord();	// Create new PublicKeyBlockRecord variable
+				
+				// Create the public key and private key
+				KeyPair kp = generateKeyPair(1000);
+				PublicKey pubKey = kp.getPublic();
+				privateKey = kp.getPrivate();
+				
+				// Encode the public key and set properties of the PublicKeyBlockRecord object
+				String encodedPubKey = Base64.getEncoder().encodeToString(pubKey.getEncoded());
+				pkbr.setPID(PID);	// Set process ID of PublicKeyBlockRecord
+				pkbr.setPubKey(encodedPubKey);	// Set Public Key of PublicKeyRecord
+
+				// Marshal the PublicKeyRecord into XML and then send to each public key server that is running
+				JAXBContext jaxbContext = JAXBContext.newInstance(PublicKeyBlockRecord.class);
+				Marshaller marshaller = jaxbContext.createMarshaller();
+				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,true);
+				StringWriter writer = new StringWriter();
+				marshaller.marshal(pkbr,writer);
+				String xmlString = writer.toString();
+
+				// Write the XML object out with ObjectOutputStream
+				out = new ObjectOutputStream(sock.getOutputStream());
+				out.writeObject(xmlString);
+				out.flush();
+				out.close();
+			}
+		}
+		catch (Exception e){e.printStackTrace();}
+	}
+
+
+/******************************************************************************************************************************************************************/
+	// Referenced from Prof. Elliott's starter files BlockInputE.java and BlockI.java
+	// Method for reading in the txt files into Block Records
+	public static void readFile(String fileName){
+		// BufferedReader use referenced from https://docs.oracle.com/javase/8/docs/api/java/io/BufferedReader.html
+		BufferedReader reader = null;
+		String uuid = "";
+		String input = "";
+		int numProcessesed = 0;
+
+		try {
+			reader = new BufferedReader(new FileReader(fileName));
+			String[] tokens = new String[10];	// String array for tokens to put into Block Record
+			input = reader.readLine();
+
+			while (input != null){
+				Date date = new Date();
+			}
+		}
+		catch (Exception e){e.printStackTrace();}
+	}
+
+/******************************************************************************************************************************************************************/
+	// Referenced from Prof. Elliott's starter files BlockI.java
+	// Method for generating key pair
+	public static KeyPair generateKeyPair(long seed) throws Exception {
+		KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    	SecureRandom rng = SecureRandom.getInstance("SHA1PRNG", "SUN");
+    	rng.setSeed(seed);
+    	keyGenerator.initialize(1024, rng);
+
+    	return (keyGenerator.generateKeyPair());
+	}
 
 }
 
