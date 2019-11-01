@@ -87,12 +87,11 @@ public class Blockchain {
 
 	public static void main(String args[]) throws Exception {
 
-		int pnum;
-		if (args.length < 1) pnum = 0;
-    	else if (args[0].equals("0")) pnum = 0;
-    	else if (args[0].equals("1")) pnum = 1;
-    	else if (args[0].equals("2")) pnum = 2;
-    	else pnum = 0; 	// If the process number provided is not 0-2, then default to 0
+		if (args.length < 1) PID = 0;
+    	else if (args[0].equals("0")) PID = 0;
+    	else if (args[0].equals("1")) PID = 1;
+    	else if (args[0].equals("2")) PID = 2;
+    	else PID = 0; 	// If the process number provided is not 0-2, then default to 0
 
     	
     	// Inititalize the queue so that it is able to prioritize blocks based on time
@@ -107,20 +106,73 @@ public class Blockchain {
 
     	BlockChain = new LinkedList<BlockRecord>();	// Initialize block chain 
 
-    	System.out.println("Process: " + Integer.toString(pnum) + "is running");
+    	System.out.println("Process: " + Integer.toString(PID) + "is running");
 
     	// Start the PublicKeyServer thread with the process ID from the arguments
-    	PublicKeyServer pubKeyServer = new PublicKeyServer(KeyServerPortBase + pnum,procPublicKey,countDownLatch);
+    	PublicKeyServer pubKeyServer = new PublicKeyServer(KeyServerPortBase + PID,procPublicKey,countDownLatch);
     	new Thread(pubKeyServer).start();
 
     	// Start the UnverifiedBlockServer thread with process ID from the arguments
-    	UnverifiedBlockServer unverifiedBlockServer = new UnverifiedBlockServer(UnverifiedBlockServerPortBase + pnum);
+    	UnverifiedBlockServer unverifiedBlockServer = new UnverifiedBlockServer(UnverifiedBlockServerPortBase + PID);
     	new Thread(unverifiedBlockServer).start();
 
     	// Start the the BlockChainServer thread with process ID from the arguments
-    	BlockChainServer blockChainServer = new BlockChainServer(BlockchainServerPortBase + pnum);
+    	BlockChainServer blockChainServer = new BlockChainServer(BlockchainServerPortBase + PID);
     	new Thread(blockChainServer).start();
+
+    	// Once we have process two running, we can start the system.
+    	if (PID == 2) runSystem = true;
+
+    	// Sleep to wait until all processes have started to run the system.
+    	while (!runSystem) Thread.sleep(1000);
+
+    	// Start the system when all processes have started
+    	startSystem(procPublicKey,countDownLatch);
 	}
+
+
+
+/******************************************************************************************************************************************************************/
+	// Referenced from Prof. Elliott's starter files bc.java and BlockInputE.java
+	// Function to start the whole system
+	public static void startSystem(HashMap<Integer,PublicKey> procPubKey, CountDownLatch latch){
+		try {
+			String file = "BlockInput" + Integer.toString(PID) + ".txt";
+
+			if (PID == 2){
+				BlockRecord fakeBlock = new BlockRecord();	// Start with new fake block
+				String id = new String(UUID.randomUUID().toString());	// Create UUID for process
+				fakeBlock.setABlockID(id);
+
+			}
+		}
+		catch (Exception e) {e.printStackTrace();}
+	}
+
+
+
+/******************************************************************************************************************************************************************/
+	// Referenced from Prof. Elliott's starter files BlockI.java and BlockInputE.java
+	//Method for marshalling Block record to XML
+	public static String marshalToXML(BlockRecord br){
+		String xmlString = "";
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(BlockRecord.class);
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			StringWriter writer = new StringWriter();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			marshaller.marshal(br,writer);
+			xmlString = writer.toString();
+		}
+		catch (Exception e){e.printStackTrace();}
+		
+
+		return xmlString;
+	}
+
+
+	
+
 }
 
 
