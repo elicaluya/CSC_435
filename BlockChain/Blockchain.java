@@ -74,7 +74,9 @@ public class Blockchain {
   	// Linked List to implement the BlockChain. Referenced from https://www.javatpoint.com/java-linkedlist
   	public static LinkedList<BlockRecord> BlockChain;
   	// Use Blocking Queue for the Univerified Blocks. Referenced from https://www.geeksforgeeks.org/blockingqueue-interface-in-java/
-  	public static BlockingQueue<BlockRecord> UnverifiedBlockQueue;
+  	public static BlockingQueue<BlockRecord> Queue;
+  	// Variable for storing the current Process ID
+  	public static int PID = 0;
 
 
   	private static String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -86,14 +88,38 @@ public class Blockchain {
 	public static void main(String args[]) throws Exception {
 
 		int pnum;
-
 		if (args.length < 1) pnum = 0;
     	else if (args[0].equals("0")) pnum = 0;
     	else if (args[0].equals("1")) pnum = 1;
     	else if (args[0].equals("2")) pnum = 2;
     	else pnum = 0; 	// If the process number provided is not 0-2, then default to 0
 
+    	
+    	// Inititalize the queue so that it is able to prioritize blocks based on time
+    	Queue = new PriorityBlockingQueue<BlockRecord>(10,new CompareBlockRecord());
 
+    	// Create Hashmap to match the process ID with public key
+    	HashMap<Integer,PublicKey> procPublicKey = new HashMap<Integer,PublicKey>();
+
+    	// Initialize CountDownLatch so we can wait until all public keys are read by the process.
+    	// Use of java.util.concurrent.CountDownLatch is referenced from: https://www.geeksforgeeks.org/countdownlatch-in-java/
+    	CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    	BlockChain = new LinkedList<BlockRecord>();	// Initialize block chain 
+
+    	System.out.println("Process: " + Integer.toString(pnum) + "is running");
+
+    	// Start the PublicKeyServer thread with the process ID from the arguments
+    	PublicKeyServer pubKeyServer = new PublicKeyServer(KeyServerPortBase + pnum,procPublicKey,countDownLatch);
+    	new Thread(pubKeyServer).start();
+
+    	// Start the UnverifiedBlockServer thread with process ID from the arguments
+    	UnverifiedBlockServer unverifiedBlockServer = new UnverifiedBlockServer(UnverifiedBlockServerPortBase + pnum);
+    	new Thread(unverifiedBlockServer).start();
+
+    	// Start the the BlockChainServer thread with process ID from the arguments
+    	BlockChainServer blockChainServer = new BlockChainServer(BlockchainServerPortBase + pnum);
+    	new Thread(blockChainServer).start();
 	}
 }
 
@@ -186,11 +212,25 @@ class BlockRecord {
 }
 
 
+/******************************************************************************************************************************************************************/
 // Method to compare TimeCreated of so the BlockRecord with the earliest timestap is pulled from the queue first.
 class CompareBlockRecord implements Comparator<BlockRecord> {
 	public int compare(BlockRecord first, BlockRecord second){
 		return first.getTimeCreated().compareTo(second.getTimeCreated());
 	}
+}
+
+
+/******************************************************************************************************************************************************************/
+// Class for for a group of block records that can be marshalled and unmarshalled to an object with JAXB annotation.
+@XmlRootElement
+class BlockRecordGroup {
+	List<BlockRecord> BlockRecords;
+
+	
+	public List<BlockRecord> getBlockRecordGroup(){return BlockRecords;}
+	@XmlElement
+		public void setBlockRecordGroup(List<BlockRecord> records){BlockRecords = records;}
 }
 
 
@@ -354,7 +394,8 @@ class UnverifiedBlockServer implements Runnable {
 
 				System.out.println("Retrieved block record for unverified block created by " + br.getACreatingProcess());
 
-				Blockchain.UnverifiedBlockQueue.put(br);
+				Blockchain.Queue.put(br);
+
 
 				System.out.println("Unverified block record with id: " + br.getABlockID() + " has been put inside the queue");
 				in.close();
@@ -396,13 +437,43 @@ class BlockChainServer implements Runnable {
 	// Worker class thread for updating the Block Chain
 	class BlockChainWorker extends Thread {
 		Socket sock;
+		ObjectInputStream in;
+		String inputString;
 
 		public BlockChainWorker(Socket s){this.sock = s;}
 	
 
 		public void run(){
 			try {
+				// Read in the object and put into string for unmarshalling
+				in = new ObjectInputStream(sock.getInputStream());
+				inputString = (String)in.readObject();
+				JAXBContext jaxbContext = JAXBContext.newInstance(BlockRecordGroup.class);
+				Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+				StringReader reader = new StringReader(inputString);
+				// Unmarshal the input read in from the Object Input Stream into Block Record Group class
+				BlockRecordGroup brg = (BlockRecordGroup) unmarshaller.unmarshal(reader);
+				// Create new BlockChain with the newly unmarshalled BlockRecordGroup
+				LinkedList<BlockRecord> bc = new LinkedList<BlockRecord>(brg.getBlockRecordGroup());
 
+				System.out.println("New block chain received, now updating local blockchain with new one");
+
+				Blockchain.BlockChain = bc;	// Update the BlockChain
+
+				// Marshal new Blockchain to xml file
+				if (Blockchain.PID == 0){
+					// Marshal the group of Block Records so we can add it to the ledger
+					JAXBContext context = JAXBContext.newInstance(BlockRecordGroup.class);
+					Marshaller marshaller = context.createMarshaller();
+					marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,true);
+					// Use Buffered Writer to write to the xml file
+					// BufferedWriter referenced from https://www.geeksforgeeks.org/io-bufferedwriter-class-methods-java/
+					BufferedWriter write = new BufferedWriter(new FileWriter("BlockchainLedgerSample.xml"));
+					marshaller.marshal(brg,write);
+					write.close();
+					System.out.println("Successfully wrote new blockchainto BlockChainLedgerSample.xml");
+				}
+				in.close();
 			}
 			catch (Exception e){e.printStackTrace();}
 		}
