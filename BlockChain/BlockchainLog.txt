@@ -1,0 +1,207 @@
+Here is the output of running the all three processes to contribute to the block chain.
+The output is mainly the same but have different timings.
+
+** There is a bug in my program that causes the 2nd process to not contribute to block chain but only verifies blocks. I can see in the xml page that there are no creating processes that are under process 2.
+
+Here are the startup console logs for the processses:
+
+Process0:
+Process: 0is running
+Starting Block Chain Server input thread using 4930
+Starting Unverified Block Server thread using 4820
+Starting Public Key Server input thread using 4710
+
+Process1:
+Process: 1is running
+Starting Public Key Server input thread using 4711
+Starting Unverified Block Server thread using 4821
+Starting Block Chain Server input thread using 4931
+
+Process2:
+Process: 2is running
+Starting Public Key Server input thread using 4712
+Starting Unverified Block Server thread using 4822
+Starting Block Chain Server input thread using 4932
+
+
+
+
+
+below will be part of the output in process0, process1, and process2 and you can see how they both interact by sending updated blockchains, verifying blocks, solving puzzles, and adding blocks to the block chain. You can also see how only process0 is the only one writing to the xml file:
+
+**Keep in mind of the bug for process2 and I will only put in this txt file the parts of the console that do not show the error messages since it prints out the correct messages.
+
+Process0:
+Received new Block Chain, now updating local blockchain with new one received.
+Retrieved public key for Process 2:[B@dfeb9b
+Retrieved public key for Process 0:[B@18597af
+Wrote new blockchain to BlockChainLedgerSample.xml
+Retrieved public key for Process 1:[B@aa57f6
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process0
+Unverified block record id: 0cabfc3c-e2ef-42e7-89d4-282c958a4080 added to queue.
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process1
+Got block record for unverified block from Process0
+Unverified block record id: d8bc495b-ee5f-4dfe-b5af-702663b47012 added to queue.
+Sent Unverified Encoded XML to all processes
+Unverified block record id: ff29b12b-12f9-40d4-9027-faaea36eb79c added to queue.
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process1
+Unverified block record id: 5993c700-553a-4109-a7f8-731423e9caee added to queue.
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process1
+Unverified block record id: 3f5250c8-7087-4fc7-911a-0a3120ce42a6 added to queue.
+Got block record for unverified block from Process0
+Unverified block record id: 64207e2a-112a-44ab-add8-1f01482f7a3e added to queue.
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process0
+Unverified block record id: 27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: c46bc9a2-b053-4dbf-81b2-11ea5fc38954 added to queue.
+Puzzle has been solved.
+Added 0cabfc3c-e2ef-42e7-89d4-282c958a4080 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Puzzle has been solved.
+Modified BlockChain does not contain the block. Resetting verification...
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Puzzle has been solved.
+Modified BlockChain does not contain the block. Resetting verification...
+Puzzle has been solved.
+Added d8bc495b-ee5f-4dfe-b5af-702663b47012 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 is in Blockchain. No need to verify.
+64207e2a-112a-44ab-add8-1f01482f7a3e is in Blockchain. No need to verify.
+Puzzle has been solved.
+Added 3f5250c8-7087-4fc7-911a-0a3120ce42a6 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Puzzle has been solved.
+Modified BlockChain does not contain the block. Resetting verification...
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+Puzzle has been solved.
+c46bc9a2-b053-4dbf-81b2-11ea5fc38954 is in Blockchain. No need to verify.
+Puzzle has been solved.
+Added ff29b12b-12f9-40d4-9027-faaea36eb79c to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Wrote new blockchain to BlockChainLedgerSample.xml
+
+
+Process1:
+Received new Block Chain, now updating local blockchain with new one received.
+Retrieved public key for Process 2:[B@6badee
+Retrieved public key for Process 0:[B@13783b0
+Retrieved public key for Process 1:[B@1d956ee
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process0
+Unverified block record id: 0cabfc3c-e2ef-42e7-89d4-282c958a4080 added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: ff29b12b-12f9-40d4-9027-faaea36eb79c added to queue.
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process0
+Unverified block record id: d8bc495b-ee5f-4dfe-b5af-702663b47012 added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: 5993c700-553a-4109-a7f8-731423e9caee added to queue.
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process0
+Got block record for unverified block from Process1
+Unverified block record id: 64207e2a-112a-44ab-add8-1f01482f7a3e added to queue.
+Unverified block record id: 3f5250c8-7087-4fc7-911a-0a3120ce42a6 added to queue.
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Sent Unverified Encoded XML to all processes
+Got block record for unverified block from Process1
+Got block record for unverified block from Process0
+Unverified block record id: 27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 added to queue.
+Unverified block record id: c46bc9a2-b053-4dbf-81b2-11ea5fc38954 added to queue.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Added 64207e2a-112a-44ab-add8-1f01482f7a3e to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Added 27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Modified BlockChain does not contain the block. Resetting verification...
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+5993c700-553a-4109-a7f8-731423e9caee is in Blockchain. No need to verify.
+c46bc9a2-b053-4dbf-81b2-11ea5fc38954 is in Blockchain. No need to verify.
+3f5250c8-7087-4fc7-911a-0a3120ce42a6 is in Blockchain. No need to verify.
+
+
+process2:
+Received new Block Chain, now updating local blockchain with new one received.
+Retrieved public key for Process 2:[B@1ccfa32
+Retrieved public key for Process 0:[B@17511ee
+Retrieved public key for Process 1:[B@d5229a
+Got block record for unverified block from Process0
+Unverified block record id: 0cabfc3c-e2ef-42e7-89d4-282c958a4080 added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: ff29b12b-12f9-40d4-9027-faaea36eb79c added to queue.
+Got block record for unverified block from Process0
+Unverified block record id: d8bc495b-ee5f-4dfe-b5af-702663b47012 added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: 5993c700-553a-4109-a7f8-731423e9caee added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: 3f5250c8-7087-4fc7-911a-0a3120ce42a6 added to queue.
+Got block record for unverified block from Process0
+Unverified block record id: 64207e2a-112a-44ab-add8-1f01482f7a3e added to queue.
+Got block record for unverified block from Process1
+Unverified block record id: c46bc9a2-b053-4dbf-81b2-11ea5fc38954 added to queue.
+Got block record for unverified block from Process0
+Unverified block record id: 27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 added to queue.
+Puzzle has been solved.
+Added 0cabfc3c-e2ef-42e7-89d4-282c958a4080 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+64207e2a-112a-44ab-add8-1f01482f7a3e is in Blockchain. No need to verify.
+27d44fc6-9e9e-491a-a5cd-9ee0466dbf53 is in Blockchain. No need to verify.
+Puzzle has been solved.
+Added ff29b12b-12f9-40d4-9027-faaea36eb79c to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+3f5250c8-7087-4fc7-911a-0a3120ce42a6 is in Blockchain. No need to verify.
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Added c46bc9a2-b053-4dbf-81b2-11ea5fc38954 to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Puzzle has been solved.
+Added 5993c700-553a-4109-a7f8-731423e9caee to the Block Chain
+Received new Block Chain, now updating local blockchain with new one received.
+Received new Block Chain, now updating local blockchain with new one received.
